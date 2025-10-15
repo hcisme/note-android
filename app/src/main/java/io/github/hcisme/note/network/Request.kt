@@ -15,12 +15,19 @@ import java.util.concurrent.TimeUnit
 
 object Request {
     lateinit var retrofit: Retrofit
+    private var tokenProvider: (() -> String?)? = null
 
     /**
      * 初始化方法
      * @param baseUrl 基础地址
      */
-    fun init(baseUrl: String, authViewModel: AuthViewModel) {
+    fun init(
+        baseUrl: String,
+        authViewModel: AuthViewModel,
+        tokenProvider: (() -> String?)? = null
+    ) {
+        this.tokenProvider = tokenProvider
+
         val okHttpClient = OkHttpClient.Builder()
             .connectTimeout(NetworkConstants.CONNECT_TIMEOUT, TimeUnit.MINUTES)
             .readTimeout(NetworkConstants.READ_TIMEOUT, TimeUnit.MINUTES)
@@ -46,9 +53,16 @@ object Request {
      */
     private fun createRequestInterceptor() = Interceptor { chain ->
         val originalRequest = chain.request()
-        val newRequest = originalRequest.newBuilder()
+        val requestBuilder = originalRequest.newBuilder()
             .addHeader("Content-Type", "application/json")
-            .build()
+
+        tokenProvider?.invoke()?.let {
+            if (it.isNotEmpty()) {
+                requestBuilder.addHeader("token", it)
+            }
+        }
+
+        val newRequest = requestBuilder.build()
         chain.proceed(newRequest)
     }
 

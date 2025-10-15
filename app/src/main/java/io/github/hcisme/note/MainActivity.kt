@@ -6,14 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import io.github.hcisme.note.constants.NetworkConstants
@@ -24,6 +18,7 @@ import io.github.hcisme.note.pages.AuthViewModel
 import io.github.hcisme.note.ui.theme.NoteTheme
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
+import io.github.hcisme.note.utils.getToken
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("SourceLockedOrientationActivity")
@@ -39,7 +34,9 @@ class MainActivity : ComponentActivity() {
             val authVM = viewModel<AuthViewModel>()
 
             LaunchedEffect(Unit) {
-                Request.init(baseUrl = NetworkConstants.BASE_URL, authViewModel = authVM)
+                Request.init(baseUrl = NetworkConstants.BASE_URL, authViewModel = authVM) {
+                    sharedPreferences.getToken()
+                }
             }
 
             CompositionLocalProvider(

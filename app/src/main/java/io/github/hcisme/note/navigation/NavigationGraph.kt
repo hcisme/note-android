@@ -7,13 +7,13 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.github.hcisme.note.constants.NavigationName
+import io.github.hcisme.note.pages.home.HomePage
+import io.github.hcisme.note.pages.login.LoginPage
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.getToken
@@ -28,7 +28,6 @@ private val exitTransition = slideOutHorizontally(
 
 @Composable
 fun NavigationGraph(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
     val navController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
 
@@ -41,11 +40,11 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
 //        startDestination = NavigationName.HOME_PAGE,
     ) {
         composable(route = NavigationName.HOME_PAGE) {
-            Text("123")
+            HomePage()
         }
 
         composable(route = NavigationName.LOGIN_PAGE) {
-            Text("456")
+            LoginPage()
         }
     }
 }
