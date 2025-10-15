@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.datetime.jvm)
     implementation(libs.gson)
+    implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
