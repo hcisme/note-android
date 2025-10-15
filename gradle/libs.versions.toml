@@ -11,7 +11,7 @@ composeBom = "2024.09.00"
 lifecycleViewmodelCompose = "2.9.4"
 navigationCompose = "2.9.5"
 retrofit = "3.0.0"
-kotlinxDatetimeJvm = "0.7.1"
+kotlinxDatetimeJvm = "0.6.1"
 gson = "2.13.1"
 coreSplashscreen = "1.0.1"
 
