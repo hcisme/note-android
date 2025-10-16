@@ -4,34 +4,46 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import io.github.hcisme.note.utils.LocalSharedPreferences
-import io.github.hcisme.note.utils.getUserInfo
+import io.github.hcisme.note.pages.home.task.TaskPage
+import io.github.hcisme.note.pages.home.user.UserPage
 
 @Composable
 fun HomePage(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val sharedPreferences = LocalSharedPreferences.current
+    val holder = rememberSaveableStateHolder()
+    var currentPage by remember { mutableIntStateOf(0) }
 
-    Scaffold(
-        topBar = { TimelineTopBar() },
-        bottomBar = {}
-    ) { innerPadding ->
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Box(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxWidth()
+                .weight(1f)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            Text(sharedPreferences.getUserInfo()?.username ?: "暂无信息")
+            holder.SaveableStateProvider(currentPage) {
+                when (currentPage) {
+                    0 -> TaskPage()
+                    1 -> UserPage()
+                }
+            }
         }
+        BottomBar(currentPage = currentPage) { currentPage = it }
     }
 
     BackHandler {
