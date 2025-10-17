@@ -9,15 +9,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import io.github.hcisme.note.components.NotificationPopup
+import io.github.hcisme.note.components.rememberNotificationManager
 import io.github.hcisme.note.constants.NetworkConstants
 import io.github.hcisme.note.navigation.NavigationGraph
 import io.github.hcisme.note.network.Request
 import io.github.hcisme.note.pages.AuthDialog
-import io.github.hcisme.note.pages.AuthViewModel
+import io.github.hcisme.note.pages.rememberAuthManager
 import io.github.hcisme.note.ui.theme.NoteTheme
 import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.LocalNotificationManager
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.getToken
 
@@ -33,22 +35,28 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            val authVM = viewModel<AuthViewModel>()
+            val notificationManager = rememberNotificationManager()
+            val authManager = rememberAuthManager()
 
             LaunchedEffect(Unit) {
-                Request.init(baseUrl = NetworkConstants.BASE_URL, authViewModel = authVM) {
+                Request.init(baseUrl = NetworkConstants.BASE_URL, authManager = authManager) {
                     sharedPreferences.getToken()
                 }
             }
 
             CompositionLocalProvider(
                 LocalNavController provides navController,
-                LocalSharedPreferences provides sharedPreferences
+                LocalSharedPreferences provides sharedPreferences,
+                LocalNotificationManager provides notificationManager
             ) {
                 NoteTheme(darkTheme = false, dynamicColor = false) {
                     NavigationGraph()
 
-                    AuthDialog()
+                    AuthDialog(authManager)
+
+                    NotificationPopup(notificationManager.notificationState) {
+                        notificationManager.hideNotification()
+                    }
                 }
             }
         }

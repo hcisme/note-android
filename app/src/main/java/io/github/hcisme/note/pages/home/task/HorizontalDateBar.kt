@@ -10,18 +10,15 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.utils.DateUtil.shortWeekdays
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HorizontalDateBar() {
-    val scope = rememberCoroutineScope()
     val taskVM: TaskViewModel = viewModel()
     val monthDates = taskVM.monthDates
 
@@ -38,7 +35,7 @@ fun HorizontalDateBar() {
         monthDates.forEachIndexed { index, date ->
             Tab(
                 selected = index == taskVM.selectedTabIndex,
-                onClick = { scope.launch { taskVM.changeDate(index = index, date = date) } },
+                onClick = { taskVM.changeDate(index = index, date = date) },
                 unselectedContentColor = MaterialTheme.colorScheme.onBackground,
                 selectedContentColor = MaterialTheme.colorScheme.primary
             ) {

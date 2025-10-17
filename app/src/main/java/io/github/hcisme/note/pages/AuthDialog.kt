@@ -12,21 +12,19 @@ import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken
 
 @Composable
-fun AuthDialog(modifier: Modifier = Modifier) {
+fun AuthDialog(authManager: AuthManager) {
     val sharedPreferences = LocalSharedPreferences.current
     val navController = LocalNavController.current
-    val authVM = viewModel<AuthViewModel>()
 
     LaunchedEffect(Unit) {
         // TODO 调取接口 判端token是否有效
     }
 
     Dialog(
-        modifier = modifier,
-        visible = authVM.loginDialogVisible,
+        visible = authManager.loginDialogVisible,
         confirmButtonText = "重新登陆",
         onConfirm = {
-            authVM.hideLoginDialog()
+            authManager.hideLoginDialog()
             sharedPreferences.clearToken()
             navController.navigate(NavigationName.LOGIN_PAGE) {
                 popUpTo(NavigationName.HOME_PAGE) {

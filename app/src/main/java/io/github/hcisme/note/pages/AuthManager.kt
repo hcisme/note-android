@@ -1,11 +1,12 @@
 package io.github.hcisme.note.pages
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 
-class AuthViewModel : ViewModel() {
+class AuthManager {
     var loginDialogVisible by mutableStateOf(false)
 
     fun showLoginDialog() {
@@ -16,3 +17,6 @@ class AuthViewModel : ViewModel() {
         loginDialogVisible = false
     }
 }
+
+@Composable
+fun rememberAuthManager() = remember { AuthManager() }

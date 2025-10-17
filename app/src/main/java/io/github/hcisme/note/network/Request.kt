@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.hcisme.note.constants.NetworkConstants
 import io.github.hcisme.note.enums.ResponseCodeEnum
-import io.github.hcisme.note.pages.AuthViewModel
+import io.github.hcisme.note.pages.AuthManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -23,7 +23,7 @@ object Request {
      */
     fun init(
         baseUrl: String,
-        authViewModel: AuthViewModel,
+        authManager: AuthManager,
         tokenProvider: (() -> String?)? = null
     ) {
         this.tokenProvider = tokenProvider
@@ -33,7 +33,7 @@ object Request {
             .readTimeout(NetworkConstants.READ_TIMEOUT, TimeUnit.MINUTES)
             .writeTimeout(NetworkConstants.WRITE_TIMEOUT, TimeUnit.MINUTES)
             .addInterceptor(createRequestInterceptor())
-            .addInterceptor(createResponseInterceptor(authViewModel))
+            .addInterceptor(createResponseInterceptor(authManager))
             .build()
 
         retrofit = Retrofit.Builder()
@@ -69,7 +69,7 @@ object Request {
     /**
      * 响应拦截器
      */
-    private fun createResponseInterceptor(authViewModel: AuthViewModel) = Interceptor { chain ->
+    private fun createResponseInterceptor(authManager: AuthManager) = Interceptor { chain ->
         val response = chain.proceed(chain.request())
         val responseBody = response.body
 
@@ -83,7 +83,7 @@ object Request {
                 val type = object : TypeToken<BaseResult<*>>() {}.type
                 val baseResult = Gson().fromJson<BaseResult<*>>(responseString, type)
                 if (baseResult.code == ResponseCodeEnum.CODE_401.code) {
-                    authViewModel.showLoginDialog()
+                    authManager.showLoginDialog()
                 }
             } catch (e: Exception) {
                 Log.e("@@", "${e.message}", e)

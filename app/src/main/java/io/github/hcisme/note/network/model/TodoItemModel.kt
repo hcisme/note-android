@@ -11,3 +11,19 @@ data class TodoItemModel(
     var createdTime: String,
     var updatedTime: String
 )
+
+data class CreateTodoItemVO(
+    val title: String,
+    val content: String,
+    val startTime: String,
+    val endTime: String
+)
+
+data class UpdateTodoItemVO(
+    val id: Int,
+    val title: String,
+    val content: String,
+    val isCompleted: Int,
+    val startTime: String,
+    val endTime: String
+)

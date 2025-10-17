@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -28,13 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
 import io.github.hcisme.note.utils.DateUtil.months
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTaskTopBar() {
-    val scope = rememberCoroutineScope()
     val taskVM = viewModel<TaskViewModel>()
     val currentDate = taskVM.currentDate
     var anchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
@@ -93,28 +90,24 @@ fun HomeTaskTopBar() {
             initialMonth = currentDate.monthNumber,
             onSelect = { year, month, day ->
                 if (year == currentDate.year && month == currentDate.monthNumber) return@DatePickerPopup
-                scope.launch {
-                    taskVM.changeDate(
-                        index = day - 1,
-                        date = LocalDate(
-                            year = year,
-                            monthNumber = month,
-                            dayOfMonth = day
-                        )
+                taskVM.changeDate(
+                    index = day - 1,
+                    date = LocalDate(
+                        year = year,
+                        monthNumber = month,
+                        dayOfMonth = day
                     )
-                }
+                )
             },
             onClickToday = { year, month, day ->
-                scope.launch {
-                    taskVM.changeDate(
-                        index = day - 1,
-                        date = LocalDate(
-                            year = year,
-                            monthNumber = month,
-                            dayOfMonth = day
-                        )
+                taskVM.changeDate(
+                    index = day - 1,
+                    date = LocalDate(
+                        year = year,
+                        monthNumber = month,
+                        dayOfMonth = day
                     )
-                }
+                )
             },
             onDismiss = {
                 showPopup = false

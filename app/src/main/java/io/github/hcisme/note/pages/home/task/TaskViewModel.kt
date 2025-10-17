@@ -7,10 +7,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.network.TodoItemService
 import io.github.hcisme.note.network.model.TodoItemModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
@@ -21,6 +24,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 
 class TaskViewModel : ViewModel() {
+    private var getTodoListJob: Job? = null
     val today get() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var currentDate by mutableStateOf(today)
     val isToday by derivedStateOf { currentDate == today }
@@ -30,23 +34,44 @@ class TaskViewModel : ViewModel() {
     var selectedTabIndex by mutableIntStateOf(
         monthDates.indexOfFirst { it == currentDate }.let { if (it >= 0) it else 0 }
     )
+    var isLoading by mutableStateOf(false)
+    var deleteDialogVisible by mutableStateOf(false)
     val todoList = mutableStateListOf<TodoItemModel>()
 
-    suspend fun changeDate(index: Int = selectedTabIndex, date: LocalDate = currentDate) {
+    fun changeDate(index: Int = selectedTabIndex, date: LocalDate = currentDate) {
         selectedTabIndex = index
         currentDate = date
 
         getTodoList()
     }
 
-    suspend fun getTodoList() {
-        todoList.clear()
-        val result = withContext(Dispatchers.IO) {
-            TodoItemService.getList(time = currentDate.toString())
+    fun getTodoList() {
+        getTodoListJob?.cancel()
+        getTodoListJob = viewModelScope.launch {
+            isLoading = true
+            todoList.clear()
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    TodoItemService.getList(time = currentDate.toString())
+                }
+                if (result.code == ResponseCodeEnum.CODE_200.code) {
+                    todoList.addAll(result.data)
+                }
+            } finally {
+                isLoading = false
+            }
         }
-        if (result.code == ResponseCodeEnum.CODE_200.code) {
-            val list = result.data
-            todoList.addAll(list)
+    }
+
+    fun deleteTodoItemById(id: Int, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                TodoItemService.deleteTodoItem(id)
+            }
+            if (result.code == ResponseCodeEnum.CODE_200.code) {
+                getTodoList()
+                onSuccess()
+            }
         }
     }
 

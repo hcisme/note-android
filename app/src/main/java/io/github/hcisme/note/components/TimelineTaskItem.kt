@@ -10,14 +10,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -30,7 +36,8 @@ import io.github.hcisme.note.network.model.TodoItemModel
 fun TimelineTaskItem(
     item: TodoItemModel,
     isCurrent: Boolean,
-    isLast: Boolean
+    isLast: Boolean,
+    onClickDelete: () -> Unit
 ) {
     val density = LocalDensity.current
 
@@ -134,6 +141,18 @@ fun TimelineTaskItem(
                         text = "是否完成：${CompletionStatusEnum.getByStatus(item.isCompleted)!!.desc}",
                         style = MaterialTheme.typography.labelMedium,
                         color = LocalContentColor.current.copy(alpha = 0.6f)
+                    )
+                }
+
+                IconButton(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    onClick = onClickDelete
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = Icons.Default.Close.name,
+                        tint = LocalContentColor.current.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
