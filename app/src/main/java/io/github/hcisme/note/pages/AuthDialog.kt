@@ -3,13 +3,30 @@ package io.github.hcisme.note.pages
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.constants.NavigationName
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken
+
+class AuthManager {
+    var loginDialogVisible by mutableStateOf(false)
+
+    fun showLoginDialog() {
+        loginDialogVisible = true
+    }
+
+    fun hideLoginDialog() {
+        loginDialogVisible = false
+    }
+}
+
+@Composable
+fun rememberAuthManager() = remember { AuthManager() }
 
 @Composable
 fun AuthDialog(authManager: AuthManager) {
