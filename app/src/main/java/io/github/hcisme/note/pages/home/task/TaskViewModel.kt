@@ -38,14 +38,18 @@ class TaskViewModel : ViewModel() {
     var deleteDialogVisible by mutableStateOf(false)
     val todoList = mutableStateListOf<TodoItemModel>()
 
-    fun changeDate(index: Int = selectedTabIndex, date: LocalDate = currentDate) {
+    fun changeDate(
+        index: Int = selectedTabIndex,
+        date: LocalDate = currentDate,
+        onError: () -> Unit
+    ) {
         selectedTabIndex = index
         currentDate = date
 
-        getTodoList()
+        getTodoList(onError = onError)
     }
 
-    fun getTodoList() {
+    fun getTodoList(onError: () -> Unit) {
         getTodoListJob?.cancel()
         getTodoListJob = viewModelScope.launch {
             isLoading = true
@@ -57,21 +61,27 @@ class TaskViewModel : ViewModel() {
                 if (result.code == ResponseCodeEnum.CODE_200.code) {
                     todoList.addAll(result.data)
                 }
+            } catch (_: Exception) {
+                onError()
             } finally {
                 isLoading = false
             }
         }
     }
 
-    fun deleteTodoItemById(id: Int, onSuccess: () -> Unit = {}) {
-        viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                TodoItemService.deleteTodoItem(id)
+    fun deleteTodoItemById(id: Int, onSuccess: () -> Unit = {}, onError: () -> Unit) {
+        try {
+            viewModelScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    TodoItemService.deleteTodoItem(id)
+                }
+                if (result.code == ResponseCodeEnum.CODE_200.code) {
+                    getTodoList(onError = onError)
+                    onSuccess()
+                }
             }
-            if (result.code == ResponseCodeEnum.CODE_200.code) {
-                getTodoList()
-                onSuccess()
-            }
+        } catch (_: Exception) {
+            onError()
         }
     }
 

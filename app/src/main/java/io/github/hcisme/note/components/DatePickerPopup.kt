@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +56,7 @@ fun DatePickerPopup(
     val monthListState = rememberLazyListState()
     var selectedYear by remember { mutableIntStateOf(initialYear) }
     var selectedMonth by remember { mutableIntStateOf(initialMonth) }
-    val years = remember(initialYear) { DateUtil.yearsAround(initialYear, spanEachSide) }
+    val years by remember { derivedStateOf { DateUtil.yearsAround(selectedYear, spanEachSide) } }
     val months = remember { (1..12).toList() }
     // Popup 的目标偏移（基于 anchor 的左下角）
     val xPx = anchorBoundsPx.left.toInt()
@@ -169,7 +170,11 @@ fun DatePickerPopup(
                                 val today =
                                     Clock.System.now()
                                         .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                                onClickToday(today.year, today.monthNumber, today.dayOfMonth)
+                                onClickToday(
+                                    today.year,
+                                    today.monthNumber,
+                                    today.dayOfMonth
+                                )
                                 onDismiss()
                             },
                             shape = MaterialTheme.shapes.small
@@ -194,4 +199,3 @@ fun DatePickerPopup(
         }
     }
 }
-

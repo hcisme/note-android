@@ -56,7 +56,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.AnimatedLabelText
 import io.github.hcisme.note.constants.NavigationName
+import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.LocalNotificationManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,11 +66,14 @@ fun LoginPage() {
     val context = LocalContext.current
     val navController = LocalNavController.current
     val focusManager = LocalFocusManager.current
+    val notificationManager = LocalNotificationManager.current
     val coroutineScope = rememberCoroutineScope()
     val loginVM = viewModel<LoginViewModel>()
 
     LaunchedEffect(Unit) {
-        loginVM.getCaptcha()
+        loginVM.getCaptcha {
+            notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
+        }
     }
 
     Box(
@@ -201,7 +206,9 @@ fun LoginPage() {
                                     interactionSource = remember { MutableInteractionSource() }
                                 ) {
                                     coroutineScope.launch {
-                                        loginVM.getCaptcha()
+                                        loginVM.getCaptcha {
+                                            notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
+                                        }
                                     }
                                 },
                             contentDescription = "验证码图片",
@@ -218,13 +225,18 @@ fun LoginPage() {
                     .width(160.dp),
                 onClick = {
                     coroutineScope.launch {
-                        loginVM.submit {
-                            navController.navigate(NavigationName.HOME_PAGE) {
-                                popUpTo(NavigationName.LOGIN_PAGE) {
-                                    inclusive = true
+                        loginVM.submit(
+                            onSuccess = {
+                                navController.navigate(NavigationName.HOME_PAGE) {
+                                    popUpTo(NavigationName.LOGIN_PAGE) {
+                                        inclusive = true
+                                    }
                                 }
+                            },
+                            onError = {
+                                notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
                             }
-                        }
+                        )
                     }
                 },
                 enabled = loginVM.isLoginIng.not(),

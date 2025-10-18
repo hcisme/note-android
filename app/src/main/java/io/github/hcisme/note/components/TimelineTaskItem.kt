@@ -138,7 +138,7 @@ fun TimelineTaskItem(
                         color = LocalContentColor.current.copy(alpha = 0.6f)
                     )
                     Text(
-                        text = "是否完成：${CompletionStatusEnum.getByStatus(item.isCompleted)!!.desc}",
+                        text = "是否完成：${CompletionStatusEnum.getByStatus(item.completed)!!.desc}",
                         style = MaterialTheme.typography.labelMedium,
                         color = LocalContentColor.current.copy(alpha = 0.6f)
                     )

@@ -5,7 +5,7 @@ data class TodoItemModel(
     var userId: String,
     var title: String,
     var content: String,
-    var isCompleted: Int,
+    var completed: Int,
     var startTime: String,
     var endTime: String,
     var createdTime: String,
@@ -15,6 +15,7 @@ data class TodoItemModel(
 data class CreateTodoItemVO(
     val title: String,
     val content: String,
+    val completed: Int,
     val startTime: String,
     val endTime: String
 )
@@ -23,7 +24,7 @@ data class UpdateTodoItemVO(
     val id: Int,
     val title: String,
     val content: String,
-    val isCompleted: Int,
+    val completed: Int,
     val startTime: String,
     val endTime: String
 )

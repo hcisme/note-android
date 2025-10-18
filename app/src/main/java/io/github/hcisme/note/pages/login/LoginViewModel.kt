@@ -29,41 +29,52 @@ class LoginViewModel(private val application: Application) : AndroidViewModel(ap
     var passwordVisible by mutableStateOf(false)
     var isLoginIng by mutableStateOf(false)
 
-    suspend fun submit(onSuccess: () -> Unit) {
+    suspend fun submit(onSuccess: () -> Unit, onError: () -> Unit) {
         emailError = if (email.isEmpty()) "邮箱为必填项" else ""
         passwordError = if (password.isEmpty()) "密码为必填项" else ""
         captchaError = if (captcha.isEmpty()) "验证码为必填项" else ""
 
         if (emailError.isNotEmpty() || passwordError.isNotEmpty() || captchaError.isNotEmpty()) return
         isLoginIng = true
-        val result = withContext(Dispatchers.IO) {
-            UserService.login(
-                LoginRequest(
-                    email = email,
-                    password = password,
-                    captchaKey = captchaKey,
-                    captcha = captcha
+        try {
+            val result = withContext(Dispatchers.IO) {
+                UserService.login(
+                    LoginRequest(
+                        email = email,
+                        password = password,
+                        captchaKey = captchaKey,
+                        captcha = captcha
+                    )
                 )
-            )
-        }
-
-        if (result.code == ResponseCodeEnum.CODE_200.code) {
-            val data = result.data
-            val token = data.token
-            application.getSps().apply {
-                saveToken(token)
-                saveUserInfo(data)
             }
-            onSuccess()
-        } else {
-            getCaptcha()
+
+            if (result.code == ResponseCodeEnum.CODE_200.code) {
+                val data = result.data
+                val token = data.token
+                application.getSps().apply {
+                    saveToken(token)
+                    saveUserInfo(data)
+                }
+                onSuccess()
+            } else {
+                getCaptcha(onError = onError)
+            }
+        } catch (_: Exception) {
+            onError()
+        } finally {
+            isLoginIng = false
         }
-        isLoginIng = false
     }
 
-    suspend fun getCaptcha() {
-        val result = withContext(Dispatchers.IO) { CaptchaService.getCaptcha() }
-        captchaBitmap = base64ToImageBitmap(result.data.captcha)
-        captchaKey = result.data.captchaKey
+    suspend fun getCaptcha(onError: () -> Unit) {
+        try {
+            val result = withContext(Dispatchers.IO) { CaptchaService.getCaptcha() }
+            if (result.code == ResponseCodeEnum.CODE_200.code) {
+                captchaBitmap = base64ToImageBitmap(result.data.captcha)
+                captchaKey = result.data.captchaKey
+            }
+        } catch (_: Exception) {
+            onError()
+        }
     }
 }
