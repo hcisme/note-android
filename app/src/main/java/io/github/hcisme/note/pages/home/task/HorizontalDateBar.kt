@@ -14,14 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.utils.DateUtil.shortWeekdays
-import io.github.hcisme.note.utils.LocalNotificationManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HorizontalDateBar() {
-    val notificationManager = LocalNotificationManager.current
     val taskVM: TaskViewModel = viewModel()
     val monthDates = taskVM.monthDates
 
@@ -38,15 +35,7 @@ fun HorizontalDateBar() {
         monthDates.forEachIndexed { index, date ->
             Tab(
                 selected = index == taskVM.selectedTabIndex,
-                onClick = {
-                    taskVM.changeDate(
-                        index = index,
-                        date = date,
-                        onError = {
-                            notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-                        }
-                    )
-                },
+                onClick = { taskVM.changeDate(index = index, date = date) },
                 unselectedContentColor = MaterialTheme.colorScheme.onBackground,
                 selectedContentColor = MaterialTheme.colorScheme.primary
             ) {

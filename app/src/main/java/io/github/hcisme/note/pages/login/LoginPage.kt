@@ -37,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -56,24 +55,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.AnimatedLabelText
 import io.github.hcisme.note.constants.NavigationName
-import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.utils.LocalNavController
-import io.github.hcisme.note.utils.LocalNotificationManager
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginPage() {
     val context = LocalContext.current
     val navController = LocalNavController.current
     val focusManager = LocalFocusManager.current
-    val notificationManager = LocalNotificationManager.current
-    val coroutineScope = rememberCoroutineScope()
     val loginVM = viewModel<LoginViewModel>()
 
     LaunchedEffect(Unit) {
-        loginVM.getCaptcha {
-            notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-        }
+        loginVM.getCaptcha()
     }
 
     Box(
@@ -204,13 +196,7 @@ fun LoginPage() {
                                 .clickable(
                                     indication = null,
                                     interactionSource = remember { MutableInteractionSource() }
-                                ) {
-                                    coroutineScope.launch {
-                                        loginVM.getCaptcha {
-                                            notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-                                        }
-                                    }
-                                },
+                                ) { loginVM.getCaptcha() },
                             contentDescription = "验证码图片",
                             contentScale = ContentScale.Crop
                         )
@@ -224,19 +210,12 @@ fun LoginPage() {
                     .padding(top = 24.dp, end = 8.dp)
                     .width(160.dp),
                 onClick = {
-                    coroutineScope.launch {
-                        loginVM.submit(
-                            onSuccess = {
-                                navController.navigate(NavigationName.HOME_PAGE) {
-                                    popUpTo(NavigationName.LOGIN_PAGE) {
-                                        inclusive = true
-                                    }
-                                }
-                            },
-                            onError = {
-                                notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
+                    loginVM.submit {
+                        navController.navigate(NavigationName.HOME_PAGE) {
+                            popUpTo(NavigationName.LOGIN_PAGE) {
+                                inclusive = true
                             }
-                        )
+                        }
                     }
                 },
                 enabled = loginVM.isLoginIng.not(),

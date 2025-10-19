@@ -30,21 +30,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.Dialog
+import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.components.TimelineTaskItem
-import io.github.hcisme.note.enums.ResponseCodeEnum
-import io.github.hcisme.note.utils.LocalNotificationManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskPage(modifier: Modifier = Modifier) {
-    val notificationManager = LocalNotificationManager.current
     val taskVM = viewModel<TaskViewModel>()
 
     LaunchedEffect(Unit) {
         if (taskVM.todoList.isEmpty()) {
-            taskVM.getTodoList(onError = {
-                notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-            })
+            taskVM.getTodoList()
         }
     }
 
@@ -73,11 +69,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
                     .weight(1f)
                     .background(MaterialTheme.colorScheme.background),
                 isRefreshing = taskVM.isLoading,
-                onRefresh = {
-                    taskVM.getTodoList(onError = {
-                        notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-                    })
-                }
+                onRefresh = { taskVM.getTodoList() }
             ) {
                 if (taskVM.todoList.isEmpty() && !taskVM.isLoading) {
                     Box(
@@ -128,10 +120,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
                                     id = it,
                                     onSuccess = {
                                         currentSelectTodoId = null
-                                        notificationManager.showNotification("删除成功")
-                                    },
-                                    onError = {
-                                        notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
+                                        NotificationManager.showNotification("删除成功")
                                     }
                                 )
                             }

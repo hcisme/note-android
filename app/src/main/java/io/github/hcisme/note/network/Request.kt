@@ -3,9 +3,12 @@ package io.github.hcisme.note.network
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.constants.NetworkConstants
 import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.pages.AuthManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -34,6 +37,7 @@ object Request {
             .writeTimeout(NetworkConstants.WRITE_TIMEOUT, TimeUnit.MINUTES)
             .addInterceptor(createRequestInterceptor())
             .addInterceptor(createResponseInterceptor(authManager))
+            .addInterceptor(createNetworkErrorInterceptor())
             .build()
 
         retrofit = Retrofit.Builder()
@@ -86,7 +90,7 @@ object Request {
                     authManager.showLoginDialog()
                 }
             } catch (e: Exception) {
-                Log.e("@@", "${e.message}", e)
+                Log.e("Note FormatError", "${e.message}", e)
             }
 
             // 重建response供后续处理
@@ -94,5 +98,48 @@ object Request {
                 .body(responseString.toResponseBody(it.contentType()))
                 .build()
         } ?: response
+    }
+
+    /**
+     * 网络错误拦截器
+     */
+    private fun createNetworkErrorInterceptor() = Interceptor { chain ->
+        try {
+            chain.proceed(chain.request())
+        } catch (e: Exception) {
+            val networkError = NetworkErrorHandler.handleException(e)
+            Log.e("Note InterceptorError", networkError.message, e)
+            throw e
+        }
+    }
+}
+
+suspend fun <T> safeRequestCall(
+    isShowErrorInfo: Boolean = true,
+    call: suspend () -> BaseResult<T>,
+    onError: () -> Unit = {},
+    onStatusCodeError: (code: Int) -> Unit = {},
+    onFinally: () -> Unit = {},
+    onSuccess: (result: BaseResult<T>) -> Unit = {}
+) {
+    return try {
+        val result = withContext(Dispatchers.IO) { call() }
+        if (result.code == ResponseCodeEnum.CODE_200.code) {
+            onSuccess(result)
+        } else {
+            if (isShowErrorInfo) {
+                NotificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
+            }
+            onStatusCodeError(result.code)
+        }
+    } catch (e: Exception) {
+        val networkError = NetworkErrorHandler.handleException(e)
+        if (isShowErrorInfo) {
+            NotificationManager.showNotification(networkError.message)
+        }
+        Log.e("Note Request Error", networkError.message, e)
+        onError()
+    } finally {
+        onFinally()
     }
 }

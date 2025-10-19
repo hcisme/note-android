@@ -8,9 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.network.TodoItemService
 import io.github.hcisme.note.network.model.TodoItemModel
+import io.github.hcisme.note.network.safeRequestCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -38,50 +38,40 @@ class TaskViewModel : ViewModel() {
     var deleteDialogVisible by mutableStateOf(false)
     val todoList = mutableStateListOf<TodoItemModel>()
 
-    fun changeDate(
-        index: Int = selectedTabIndex,
-        date: LocalDate = currentDate,
-        onError: () -> Unit
-    ) {
+    fun changeDate(index: Int = selectedTabIndex, date: LocalDate = currentDate) {
         selectedTabIndex = index
         currentDate = date
 
-        getTodoList(onError = onError)
+        getTodoList()
     }
 
-    fun getTodoList(onError: () -> Unit) {
+    fun getTodoList() {
         getTodoListJob?.cancel()
         getTodoListJob = viewModelScope.launch {
             isLoading = true
-            todoList.clear()
-            try {
-                val result = withContext(Dispatchers.IO) {
-                    TodoItemService.getList(time = currentDate.toString())
+
+            safeRequestCall(
+                call = { withContext(Dispatchers.IO) { TodoItemService.getList(time = currentDate.toString()) } },
+                onFinally = { isLoading = false },
+                onSuccess = {
+                    todoList.apply {
+                        clear()
+                        addAll(it.data)
+                    }
                 }
-                if (result.code == ResponseCodeEnum.CODE_200.code) {
-                    todoList.addAll(result.data)
-                }
-            } catch (_: Exception) {
-                onError()
-            } finally {
-                isLoading = false
-            }
+            )
         }
     }
 
-    fun deleteTodoItemById(id: Int, onSuccess: () -> Unit = {}, onError: () -> Unit) {
-        try {
-            viewModelScope.launch {
-                val result = withContext(Dispatchers.IO) {
-                    TodoItemService.deleteTodoItem(id)
-                }
-                if (result.code == ResponseCodeEnum.CODE_200.code) {
-                    getTodoList(onError = onError)
+    fun deleteTodoItemById(id: Int, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            safeRequestCall(
+                call = { withContext(Dispatchers.IO) { TodoItemService.deleteTodoItem(id) } },
+                onSuccess = {
+                    getTodoList()
                     onSuccess()
                 }
-            }
-        } catch (_: Exception) {
-            onError()
+            )
         }
     }
 

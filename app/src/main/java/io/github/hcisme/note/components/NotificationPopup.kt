@@ -34,7 +34,7 @@ data class NotificationState(
     val isVisible: Boolean = false
 )
 
-class NotificationManager {
+object NotificationManager {
     var notificationState by mutableStateOf(NotificationState())
 
     fun showNotification(message: String) {
@@ -52,9 +52,6 @@ class NotificationManager {
 }
 
 @Composable
-fun rememberNotificationManager() = remember { NotificationManager() }
-
-@Composable
 fun NotificationPopup(
     notificationState: NotificationState,
     onDismiss: () -> Unit = {}
@@ -62,7 +59,7 @@ fun NotificationPopup(
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
     val windowWidthPx = windowInfo.containerSize.width
-    val contentPx = remember { with(density) { 120.dp.toPx() } }
+    val contentPx = remember { with(density) { 160.dp.toPx() } }
     val yOffsetPx = remember { with(density) { 100.dp.toPx() } }
     val xOffsetPx = remember(windowWidthPx) { (windowWidthPx / 2) - (contentPx / 2) }
 

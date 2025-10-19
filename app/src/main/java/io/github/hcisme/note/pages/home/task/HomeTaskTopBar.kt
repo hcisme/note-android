@@ -26,15 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
-import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.utils.DateUtil.months
-import io.github.hcisme.note.utils.LocalNotificationManager
 import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTaskTopBar() {
-    val notificationManager = LocalNotificationManager.current
     val taskVM = viewModel<TaskViewModel>()
     val currentDate = taskVM.currentDate
     var anchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
@@ -69,9 +66,7 @@ fun HomeTaskTopBar() {
         },
         actions = {
             FilledTonalButton(
-                onClick = {
-                    notificationManager.showNotification("测试信息")
-                },
+                onClick = {},
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -97,27 +92,13 @@ fun HomeTaskTopBar() {
                 if (year == currentDate.year && month == currentDate.monthNumber) return@DatePickerPopup
                 taskVM.changeDate(
                     index = day - 1,
-                    date = LocalDate(
-                        year = year,
-                        monthNumber = month,
-                        dayOfMonth = day
-                    ),
-                    onError = {
-                        notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-                    }
+                    date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
                 )
             },
             onClickToday = { year, month, day ->
                 taskVM.changeDate(
                     index = day - 1,
-                    date = LocalDate(
-                        year = year,
-                        monthNumber = month,
-                        dayOfMonth = day
-                    ),
-                    onError = {
-                        notificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
-                    }
+                    date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
                 )
             },
             onDismiss = {
