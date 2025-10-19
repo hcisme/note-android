@@ -32,10 +32,13 @@ import io.github.hcisme.note.R
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.components.TimelineTaskItem
+import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.navigateToTodoForm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskPage(modifier: Modifier = Modifier) {
+    val navHostController = LocalNavController.current
     val taskVM = viewModel<TaskViewModel>()
 
     LaunchedEffect(Unit) {
@@ -93,7 +96,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
                     }
                     LazyColumn(modifier = Modifier.fillMaxSize()) {}
                 } else {
-                    var currentSelectTodoId by remember { mutableStateOf<Int?>(null) }
+                    var currentSelectTodoId by remember { mutableStateOf<Long?>(null) }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         itemsIndexed(taskVM.todoList) { index, it ->
@@ -101,6 +104,9 @@ fun TaskPage(modifier: Modifier = Modifier) {
                                 it,
                                 isCurrent = index == 0,
                                 isLast = index == taskVM.todoList.size - 1,
+                                onClick = {
+                                    navHostController.navigateToTodoForm(id = it.id)
+                                },
                                 onClickDelete = {
                                     currentSelectTodoId = it.id
                                     taskVM.deleteDialogVisible = true

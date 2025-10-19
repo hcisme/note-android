@@ -17,11 +17,14 @@ interface TodoItemApi {
     suspend fun getList(@Query("time") time: String): BaseResult<List<TodoItemModel>>
 
     @DELETE("/api/todoItem/{id}")
-    suspend fun deleteTodoItem(@Path("id") id: Int): BaseResult<Any?>
+    suspend fun deleteTodoItem(@Path("id") id: Long): BaseResult<Any?>
 
     @POST("/api/todoItem/createItem")
     suspend fun createItem(@Body item: CreateTodoItemVO): BaseResult<Any?>
 
     @PUT("/api/todoItem/updateItem")
     suspend fun updateItem(@Body item: UpdateTodoItemVO): BaseResult<Any?>
+
+    @GET("/api/todoItem/{id}")
+    suspend fun getTodoById(@Path("id") id: Long): BaseResult<TodoItemModel?>
 }

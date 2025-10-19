@@ -1,7 +1,7 @@
 package io.github.hcisme.note.network.model
 
 data class TodoItemModel(
-    var id: Int,
+    var id: Long,
     var userId: String,
     var title: String,
     var content: String,
@@ -21,7 +21,7 @@ data class CreateTodoItemVO(
 )
 
 data class UpdateTodoItemVO(
-    val id: Int,
+    val id: Long,
     val title: String,
     val content: String,
     val completed: Int,

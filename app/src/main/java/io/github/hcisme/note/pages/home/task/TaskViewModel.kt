@@ -63,7 +63,7 @@ class TaskViewModel : ViewModel() {
         }
     }
 
-    fun deleteTodoItemById(id: Int, onSuccess: () -> Unit = {}) {
+    fun deleteTodoItemById(id: Long, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             safeRequestCall(
                 call = { withContext(Dispatchers.IO) { TodoItemService.deleteTodoItem(id) } },

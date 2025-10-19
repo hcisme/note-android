@@ -27,11 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
 import io.github.hcisme.note.utils.DateUtil.months
+import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.navigateToTodoForm
 import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTaskTopBar() {
+    val navHostController = LocalNavController.current
     val taskVM = viewModel<TaskViewModel>()
     val currentDate = taskVM.currentDate
     var anchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
@@ -66,7 +69,7 @@ fun HomeTaskTopBar() {
         },
         actions = {
             FilledTonalButton(
-                onClick = {},
+                onClick = { navHostController.navigateToTodoForm() },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
