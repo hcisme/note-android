@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.hcisme.note.components.NotificationManager
+import io.github.hcisme.note.enums.Message
 import io.github.hcisme.note.network.CaptchaService
 import io.github.hcisme.note.network.UserService
 import io.github.hcisme.note.network.model.LoginRequest
@@ -62,6 +64,7 @@ class LoginViewModel(private val application: Application) : AndroidViewModel(ap
                         saveToken(token)
                         saveUserInfo(data)
                     }
+                    NotificationManager.showNotification(Message.LOGIN_SUCCESS.message)
                     onSuccess()
                 }
             )

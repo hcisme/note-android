@@ -32,9 +32,9 @@ object Request {
         this.tokenProvider = tokenProvider
 
         val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(NetworkConstants.CONNECT_TIMEOUT, TimeUnit.MINUTES)
-            .readTimeout(NetworkConstants.READ_TIMEOUT, TimeUnit.MINUTES)
-            .writeTimeout(NetworkConstants.WRITE_TIMEOUT, TimeUnit.MINUTES)
+            .connectTimeout(NetworkConstants.CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(NetworkConstants.READ_TIMEOUT, TimeUnit.SECONDS)
+            .writeTimeout(NetworkConstants.WRITE_TIMEOUT, TimeUnit.SECONDS)
             .addInterceptor(createRequestInterceptor())
             .addInterceptor(createResponseInterceptor(authManager))
             .addInterceptor(createNetworkErrorInterceptor())

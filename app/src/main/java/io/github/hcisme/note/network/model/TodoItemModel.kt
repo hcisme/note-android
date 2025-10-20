@@ -12,16 +12,8 @@ data class TodoItemModel(
     var updatedTime: String
 )
 
-data class CreateTodoItemVO(
-    val title: String,
-    val content: String,
-    val completed: Int,
-    val startTime: String,
-    val endTime: String
-)
-
-data class UpdateTodoItemVO(
-    val id: Long,
+data class EditTodoItemVO(
+    val id: Long? = null,
     val title: String,
     val content: String,
     val completed: Int,

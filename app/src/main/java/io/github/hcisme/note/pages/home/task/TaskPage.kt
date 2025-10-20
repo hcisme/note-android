@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.Dialog
-import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.components.TimelineTaskItem
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.navigateToTodoForm
@@ -42,9 +41,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
     val taskVM = viewModel<TaskViewModel>()
 
     LaunchedEffect(Unit) {
-        if (taskVM.todoList.isEmpty()) {
-            taskVM.getTodoList()
-        }
+        taskVM.getTodoList()
     }
 
     Scaffold(
@@ -126,7 +123,6 @@ fun TaskPage(modifier: Modifier = Modifier) {
                                     id = it,
                                     onSuccess = {
                                         currentSelectTodoId = null
-                                        NotificationManager.showNotification("删除成功")
                                     }
                                 )
                             }

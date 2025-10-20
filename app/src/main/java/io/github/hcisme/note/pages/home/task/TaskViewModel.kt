@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.hcisme.note.components.NotificationManager
+import io.github.hcisme.note.enums.Message
 import io.github.hcisme.note.network.TodoItemService
 import io.github.hcisme.note.network.model.TodoItemModel
 import io.github.hcisme.note.network.safeRequestCall
@@ -68,6 +70,7 @@ class TaskViewModel : ViewModel() {
             safeRequestCall(
                 call = { withContext(Dispatchers.IO) { TodoItemService.deleteTodoItem(id) } },
                 onSuccess = {
+                    NotificationManager.showNotification(Message.DELETE_SUCCESS.message)
                     getTodoList()
                     onSuccess()
                 }

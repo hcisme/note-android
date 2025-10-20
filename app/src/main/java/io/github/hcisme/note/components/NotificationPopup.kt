@@ -86,7 +86,7 @@ fun NotificationPopup(
                     .width(with(density) { contentPx.toDp() })
                     .wrapContentHeight()
                     .clip(RoundedCornerShape(18.dp))
-                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
                     .padding(horizontal = 24.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {

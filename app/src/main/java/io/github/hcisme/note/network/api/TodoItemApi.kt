@@ -1,9 +1,8 @@
 package io.github.hcisme.note.network.api
 
 import io.github.hcisme.note.network.BaseResult
-import io.github.hcisme.note.network.model.CreateTodoItemVO
+import io.github.hcisme.note.network.model.EditTodoItemVO
 import io.github.hcisme.note.network.model.TodoItemModel
-import io.github.hcisme.note.network.model.UpdateTodoItemVO
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -20,10 +19,10 @@ interface TodoItemApi {
     suspend fun deleteTodoItem(@Path("id") id: Long): BaseResult<Any?>
 
     @POST("/api/todoItem/createItem")
-    suspend fun createItem(@Body item: CreateTodoItemVO): BaseResult<Any?>
+    suspend fun createItem(@Body item: EditTodoItemVO): BaseResult<Any?>
 
     @PUT("/api/todoItem/updateItem")
-    suspend fun updateItem(@Body item: UpdateTodoItemVO): BaseResult<Any?>
+    suspend fun updateItem(@Body item: EditTodoItemVO): BaseResult<Any?>
 
     @GET("/api/todoItem/{id}")
     suspend fun getTodoById(@Path("id") id: Long): BaseResult<TodoItemModel?>

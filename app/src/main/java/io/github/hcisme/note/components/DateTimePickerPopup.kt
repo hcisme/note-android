@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.hcisme.note.utils.formatWithPattern
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -57,10 +58,13 @@ import kotlin.math.abs
 @Composable
 fun DateTimePickerPopup(
     visible: Boolean,
+    initialDateTime: LocalDateTime? = null,
     anchorBoundsPx: Rect,
     onDismiss: () -> Unit,
     onDateTimeSelected: (LocalDateTime) -> Unit = {}
 ) {
+    val defaultTime =
+        remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()) }
     val xPx = anchorBoundsPx.left.toInt()
     val yPx = anchorBoundsPx.bottom.toInt()
 
@@ -79,7 +83,10 @@ fun DateTimePickerPopup(
             enter = fadeIn(animationSpec = tween(160)),
             exit = fadeOut(animationSpec = tween(140))
         ) {
-            DateTimePicker(onDateTimeChanged = onDateTimeSelected)
+            DateTimePicker(
+                initialDateTime = initialDateTime ?: defaultTime,
+                onDateTimeChanged = onDateTimeSelected
+            )
         }
     }
 }
@@ -87,10 +94,10 @@ fun DateTimePickerPopup(
 @Composable
 fun DateTimePicker(
     modifier: Modifier = Modifier,
-    initialDateTime: LocalDateTime = remember {
-        Clock.System.now()
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-    },
+    /**
+     * 只在初始化时使用一次
+     */
+    initialDateTime: LocalDateTime,
     minYear: Int = 1900,
     maxYear: Int = 2100,
     onDateTimeChanged: (LocalDateTime) -> Unit,
@@ -100,11 +107,6 @@ fun DateTimePicker(
     colors: DateTimePickerColors = DateTimePickerDefaults.colors()
 ) {
     var selectedDateTime by remember { mutableStateOf(initialDateTime) }
-
-    // 当外部的 initialDateTime 变化时，同步内部状态
-    LaunchedEffect(initialDateTime) {
-        selectedDateTime = initialDateTime
-    }
 
     val years = (minYear..maxYear).map { it.toString() }
     val months = (1..12).map { it.toString().padStart(2, '0') }
@@ -130,7 +132,7 @@ fun DateTimePicker(
 
     fun update(newDateTime: LocalDateTime) {
         // 只有当值真正改变时才更新，防止不必要的重组
-        if (newDateTime != selectedDateTime) {
+        if (newDateTime.formatWithPattern() != selectedDateTime.formatWithPattern()) {
             selectedDateTime = newDateTime
             // 使用防抖机制，避免频繁回调
             onDateTimeChanged(newDateTime)
