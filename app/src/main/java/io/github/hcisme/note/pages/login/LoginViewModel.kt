@@ -22,8 +22,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class LoginViewModel(private val application: Application) : AndroidViewModel(application) {
-    var email by mutableStateOf("147@qq.com")
-    var password by mutableStateOf("emmmm000")
+    var email by mutableStateOf("@163.com")
+    var password by mutableStateOf("")
     var captcha by mutableStateOf("")
     var captchaKey by mutableStateOf("")
     var emailError by mutableStateOf("")
