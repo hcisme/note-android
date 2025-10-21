@@ -47,7 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.AnimatedLabelText
 import io.github.hcisme.note.components.RotationIcon
-import io.github.hcisme.note.constants.NavigationName
+import io.github.hcisme.note.navigation.navigateToHomeAndClearStack
 import io.github.hcisme.note.utils.LocalNavController
 
 @Composable
@@ -202,15 +202,7 @@ fun LoginPage() {
                     .align(Alignment.End)
                     .padding(top = 24.dp, end = 8.dp)
                     .width(160.dp),
-                onClick = {
-                    loginVM.submit {
-                        navController.navigate(NavigationName.HOME_PAGE) {
-                            popUpTo(NavigationName.LOGIN_PAGE) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                },
+                onClick = { loginVM.submit { navController.navigateToHomeAndClearStack() } },
                 enabled = loginVM.isLoginIng.not(),
                 shape = MaterialTheme.shapes.small
             ) {

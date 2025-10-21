@@ -32,7 +32,7 @@ import io.github.hcisme.note.R
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.components.TimelineTaskItem
 import io.github.hcisme.note.utils.LocalNavController
-import io.github.hcisme.note.utils.navigateToTodoForm
+import io.github.hcisme.note.navigation.navigateToTodoForm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +98,8 @@ fun TaskPage(modifier: Modifier = Modifier) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         itemsIndexed(taskVM.todoList) { index, it ->
                             TimelineTaskItem(
-                                it,
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                item = it,
                                 isCurrent = index == 0,
                                 isLast = index == taskVM.todoList.size - 1,
                                 onClick = {

@@ -73,6 +73,7 @@ fun TodoFormPage(id: Long? = null) {
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text(text = if (isEdit) "编辑事项" else "新增事项") },
@@ -334,7 +335,10 @@ fun TodoFormPage(id: Long? = null) {
             visible = startTimeVisible,
             initialDateTime = if (todoFormVM.item.startTime.isNotEmpty()) todoFormVM.item.startTime.toLocalDateTime() else null,
             anchorBoundsPx = it,
-            onDismiss = { startTimeVisible = false },
+            onDismiss = {
+                startTimeVisible = false
+                startTimeAnchorBoundsPx = null
+            },
             onDateTimeSelected = { dateTime ->
                 todoFormVM.onValuesChange(todoFormVM.item.copy(startTime = dateTime.formatWithPattern()))
             }
@@ -346,7 +350,10 @@ fun TodoFormPage(id: Long? = null) {
             visible = endTimeVisible,
             initialDateTime = if (todoFormVM.item.endTime.isNotEmpty()) todoFormVM.item.endTime.toLocalDateTime() else null,
             anchorBoundsPx = it,
-            onDismiss = { endTimeVisible = false },
+            onDismiss = {
+                endTimeVisible = false
+                endTimeAnchorBoundsPx = null
+            },
             onDateTimeSelected = { dateTime ->
                 todoFormVM.onValuesChange(todoFormVM.item.copy(endTime = dateTime.formatWithPattern()))
             }

@@ -5,12 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +22,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,29 +33,35 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.hcisme.note.enums.CompletionStatusEnum
 import io.github.hcisme.note.network.model.TodoItemModel
+import io.github.hcisme.note.utils.noRippleClickable
 
 @Composable
 fun TimelineTaskItem(
+    modifier: Modifier = Modifier,
     item: TodoItemModel,
     isCurrent: Boolean,
     isLast: Boolean,
+    minHeight: Dp = 160.dp,
     onClick: () -> Unit = {},
     onClickDelete: () -> Unit = {}
 ) {
     val density = LocalDensity.current
 
     Row(
-        modifier = Modifier
+        modifier = modifier
+            .padding(top = 12.dp)
             .fillMaxWidth()
-            .height(200.dp)
+            .height(IntrinsicSize.Min)
+            .heightIn(min = minHeight)
     ) {
         Column(
             modifier = Modifier
-                .padding(start = 16.dp, top = 4.dp)
-                .width(56.dp)
+                .width(48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = item.startTime.substring(11, 16),
@@ -67,49 +74,55 @@ fun TimelineTaskItem(
             )
         }
 
-        val primaryColor = MaterialTheme.colorScheme.primary
-        Canvas(
+        Box(
             modifier = Modifier
-                .fillMaxHeight()
-                .padding(start = 8.dp, top = 8.dp)
+                .width(24.dp)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            val radius = with(density) { 3.dp.toPx() }
-            val strokeWidth = with(density) { (1.5).dp.toPx() }
-            if (isCurrent) {
-                drawCircle(
-                    color = primaryColor,
-                    radius = radius * 2,
-                    center = Offset(radius, radius * 2),
-                    style = Stroke(strokeWidth)
-                )
-                drawCircle(
-                    color = primaryColor,
-                    radius = radius,
-                    center = Offset(radius, radius * 2),
-                )
-            } else {
-                drawCircle(
-                    color = primaryColor,
-                    radius = radius * 1.5f,
-                    center = Offset(radius, radius * 1.5f),
-                    style = Stroke(strokeWidth)
-                )
-            }
-            if (isLast.not()) {
-                drawLine(
-                    color = primaryColor,
-                    start = Offset(radius, radius * if (isCurrent) 6 else 5),
-                    end = Offset(radius, size.height),
-                    strokeWidth = strokeWidth
-                )
+            val primaryColor = MaterialTheme.colorScheme.primary
+            Canvas(
+                modifier = Modifier
+                    .width(6.dp)
+                    .fillMaxHeight()
+            ) {
+                val radius = with(density) { 3.dp.toPx() }
+                val strokeWidth = with(density) { (1.5).dp.toPx() }
+                if (isCurrent) {
+                    drawCircle(
+                        color = primaryColor,
+                        radius = radius * 2,
+                        center = Offset(radius, radius * 2),
+                        style = Stroke(strokeWidth)
+                    )
+                    drawCircle(
+                        color = primaryColor,
+                        radius = radius,
+                        center = Offset(radius, radius * 2),
+                    )
+                } else {
+                    drawCircle(
+                        color = primaryColor,
+                        radius = radius * 1.5f,
+                        center = Offset(radius, radius * 1.5f),
+                        style = Stroke(strokeWidth)
+                    )
+                }
+                if (isLast.not()) {
+                    drawLine(
+                        color = primaryColor,
+                        start = Offset(radius, radius * if (isCurrent) 6 else 5),
+                        end = Offset(radius, size.height),
+                        strokeWidth = strokeWidth
+                    )
+                }
             }
         }
 
         Card(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .heightIn(min = minHeight)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable(
                     indication = null,
@@ -135,7 +148,11 @@ fun TimelineTaskItem(
                     )
                     Text(text = item.content)
 
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(vertical = 4.dp)
+                    )
 
                     Text(
                         text = "开始时间：${item.startTime}",
@@ -154,17 +171,16 @@ fun TimelineTaskItem(
                     )
                 }
 
-                IconButton(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    onClick = onClickDelete
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = Icons.Default.Close.name,
-                        tint = LocalContentColor.current.copy(alpha = 0.6f),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = Icons.Default.Close.name,
+                    tint = LocalContentColor.current,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 8.dp)
+                        .size(16.dp)
+                        .noRippleClickable(onClick = onClickDelete)
+                )
             }
         }
     }

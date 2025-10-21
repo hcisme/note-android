@@ -28,7 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
 import io.github.hcisme.note.utils.DateUtil.months
 import io.github.hcisme.note.utils.LocalNavController
-import io.github.hcisme.note.utils.navigateToTodoForm
+import io.github.hcisme.note.navigation.navigateToTodoForm
 import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)

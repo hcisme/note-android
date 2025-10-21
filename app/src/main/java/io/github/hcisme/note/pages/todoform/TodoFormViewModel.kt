@@ -69,11 +69,11 @@ class TodoFormViewModel : ViewModel() {
                 },
                 onFinally = { loading = false },
                 onSuccess = {
-                    haveChangedForm = false
-                    onSuccess()
                     NotificationManager.showNotification(
                         if (newItem.id == null) Message.ADD_SUCCESS.message else Message.EDIT_SUCCESS.message
                     )
+                    haveChangedForm = false
+                    onSuccess()
                 }
             )
         }

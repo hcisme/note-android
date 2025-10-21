@@ -1,5 +1,7 @@
 package io.github.hcisme.note.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -22,7 +24,7 @@ import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.getToken
 
 private const val AnimationInDuration = 400
-private const val AnimationOutDuration = 400
+private const val AnimationOutDuration = 200
 private val AnimationEasing = LinearOutSlowInEasing
 private val enterTransition = slideInHorizontally(
     animationSpec = tween(AnimationInDuration, easing = AnimationEasing),
@@ -43,6 +45,10 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         navController = navController,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
         startDestination = if (sharedPreferences.getToken() == null) NavigationName.LOGIN_PAGE else NavigationName.HOME_PAGE
     ) {
         composable(route = NavigationName.HOME_PAGE) {
