@@ -79,6 +79,8 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease --stacktrace
         env:
+          DEBUG_BASE_URL: ${{ secrets.DEBUG_BASE_URL }}
+          RELEASE_BASE_URL: ${{ secrets.RELEASE_BASE_URL }}
           ORG_GRADLE_PROJECT_RELEASE_STORE_FILE: ${{ env.RELEASE_STORE_FILE }}
           ORG_GRADLE_PROJECT_RELEASE_STORE_PASSWORD: ${{ env.RELEASE_STORE_PASSWORD }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_ALIAS: ${{ env.RELEASE_KEY_ALIAS }}

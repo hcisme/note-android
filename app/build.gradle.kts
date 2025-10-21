@@ -12,8 +12,12 @@ val localProperties = Properties().apply {
         file.inputStream().use { load(it) }
     }
 }
-val debugBaseUrl: String by lazy { localProperties.getProperty("debug.base.url", "") }
-val releaseBaseUrl: String by lazy { localProperties.getProperty("release.base.url", "") }
+val debugBaseUrl: String by lazy {
+    localProperties.getProperty("debug.base.url", System.getenv("DEBUG_BASE_URL"))
+}
+val releaseBaseUrl: String by lazy {
+    localProperties.getProperty("release.base.url", System.getenv("RELEASE_BASE_URL"))
+}
 
 android {
     namespace = "io.github.hcisme.note"
