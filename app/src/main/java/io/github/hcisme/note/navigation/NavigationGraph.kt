@@ -23,7 +23,7 @@ import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.getToken
 
-private const val AnimationInDuration = 400
+private const val AnimationInDuration = 280
 private const val AnimationOutDuration = 200
 private val AnimationEasing = LinearOutSlowInEasing
 private val enterTransition = slideInHorizontally(
