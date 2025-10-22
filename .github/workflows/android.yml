@@ -96,5 +96,5 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 修复了构建签名路径问题
-            - 优化了 CI 工作流配置
+            - 修复过了晚上24点后 当前日期还停留在昨天的bug
+            - 优化代码
