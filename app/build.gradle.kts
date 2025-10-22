@@ -55,7 +55,7 @@ android {
             buildConfigField("String", "BASE_URL", releaseBaseUrl)
             // 应用release签名配置
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
