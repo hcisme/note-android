@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,9 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
+import io.github.hcisme.note.navigation.navigateToTodoForm
 import io.github.hcisme.note.utils.DateUtil.months
 import io.github.hcisme.note.utils.LocalNavController
-import io.github.hcisme.note.navigation.navigateToTodoForm
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +41,18 @@ fun HomeTaskTopBar() {
     val currentDate = taskVM.currentDate
     var anchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
     var showPopup by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(5_000)
+            if (taskVM.isToday && taskVM.today != taskVM.currentDate) {
+                taskVM.changeDate(
+                    index = taskVM.selectedTabIndex + 1,
+                    date = taskVM.today
+                )
+            }
+        }
+    }
 
     TopAppBar(
         title = {

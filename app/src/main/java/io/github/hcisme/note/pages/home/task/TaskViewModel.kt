@@ -29,6 +29,7 @@ class TaskViewModel : ViewModel() {
     private var getTodoListJob: Job? = null
     val today get() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var currentDate by mutableStateOf(today)
+        private set
     val isToday by derivedStateOf { currentDate == today }
     val monthDates: List<LocalDate> by derivedStateOf {
         buildMonthDates(currentDate.year, currentDate.monthNumber)
@@ -36,6 +37,7 @@ class TaskViewModel : ViewModel() {
     var selectedTabIndex by mutableIntStateOf(
         monthDates.indexOfFirst { it == currentDate }.let { if (it >= 0) it else 0 }
     )
+        private set
     var isLoading by mutableStateOf(false)
     var deleteDialogVisible by mutableStateOf(false)
     val todoList = mutableStateListOf<TodoItemModel>()

@@ -3,8 +3,6 @@ package io.github.hcisme.note.pages.todoform
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +46,7 @@ import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.components.RotationIcon
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.formatWithPattern
+import io.github.hcisme.note.utils.noRippleClickable
 import io.github.hcisme.note.utils.toLocalDateTime
 import io.github.hcisme.note.utils.withBadge
 
@@ -124,23 +123,23 @@ fun TodoFormPage(id: Long? = null) {
                 .padding(16.dp)
         ) {
             // 标题输入
+            Text(
+                "标题",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.withBadge(
+                    badgeText = "*",
+                    textColor = MaterialTheme.colorScheme.error,
+                    offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
+                )
+            )
             OutlinedTextField(
                 value = todoFormVM.item.title,
                 onValueChange = {
                     todoFormVM.onValuesChange(todoFormVM.item.copy(title = it))
                 },
-                label = {
-                    Text(
-                        "标题",
-                        modifier = Modifier.withBadge(
-                            badgeText = "*",
-                            textColor = MaterialTheme.colorScheme.error,
-                            offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
-                        )
-                    )
-                },
                 placeholder = { Text("请输入标题") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
                 isError = todoFormVM.errorMap.containsKey("title"),
                 supportingText = {
                     if (todoFormVM.errorMap.containsKey("title")) {
@@ -166,7 +165,6 @@ fun TodoFormPage(id: Long? = null) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                val mutableInteractionSource = remember { MutableInteractionSource() }
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -178,10 +176,7 @@ fun TodoFormPage(id: Long? = null) {
                     )
                     Text(
                         text = "未完成",
-                        modifier = Modifier.clickable(
-                            indication = null,
-                            interactionSource = mutableInteractionSource
-                        ) {
+                        modifier = Modifier.noRippleClickable {
                             todoFormVM.onValuesChange(todoFormVM.item.copy(completed = 0))
                         }
                     )
@@ -196,10 +191,7 @@ fun TodoFormPage(id: Long? = null) {
                     )
                     Text(
                         text = "已完成",
-                        modifier = Modifier.clickable(
-                            indication = null,
-                            interactionSource = mutableInteractionSource
-                        ) {
+                        modifier = Modifier.noRippleClickable {
                             todoFormVM.onValuesChange(todoFormVM.item.copy(completed = 1))
                         }
                     )
@@ -232,10 +224,7 @@ fun TodoFormPage(id: Long? = null) {
                     .onGloballyPositioned { coords ->
                         startTimeAnchorBoundsPx = coords.boundsInWindow()
                     }
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) { startTimeVisible = true }
+                    .noRippleClickable { startTimeVisible = true }
                     .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
@@ -278,10 +267,7 @@ fun TodoFormPage(id: Long? = null) {
                     .onGloballyPositioned { coords ->
                         endTimeAnchorBoundsPx = coords.boundsInWindow()
                     }
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) { endTimeVisible = true }
+                    .noRippleClickable { endTimeVisible = true }
                     .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
@@ -301,22 +287,23 @@ fun TodoFormPage(id: Long? = null) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // 描述输入
+            Text(
+                text = "描述",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.withBadge(
+                    badgeText = "*",
+                    textColor = MaterialTheme.colorScheme.error,
+                    offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
+                )
+            )
             OutlinedTextField(
                 value = todoFormVM.item.content,
                 onValueChange = {
                     todoFormVM.onValuesChange(todoFormVM.item.copy(content = it))
                 },
-                label = {
-                    Text(
-                        text = "描述",
-                        modifier = Modifier.withBadge(
-                            badgeText = "*",
-                            textColor = MaterialTheme.colorScheme.error,
-                            offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
-                        )
-                    )
-                },
                 modifier = Modifier
+                    .padding(top = 4.dp)
                     .fillMaxWidth()
                     .height(160.dp),
                 placeholder = { Text("请输入描述内容") },
