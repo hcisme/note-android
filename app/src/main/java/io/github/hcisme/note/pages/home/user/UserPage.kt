@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -62,12 +62,13 @@ fun UserPage(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .systemBarsPadding()
+            .statusBarsPadding()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(bottom = 16.dp)
         ) {
             // 标题
             Text(
@@ -157,8 +158,9 @@ fun UserPage(modifier: Modifier = Modifier) {
             Button(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                    .fillMaxWidth(0.8f)
+                    .height(56.dp)
+                    .align(alignment = Alignment.CenterHorizontally),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer
@@ -199,6 +201,9 @@ fun UserPage(modifier: Modifier = Modifier) {
         },
         onDismissRequest = { showLogoutDialog = false }
     ) {
-        Text("退出？ ${userVM.userInfo?.username ?: ""}")
+        val username = userVM.userInfo?.username
+        val newName = if (username != null) "@$username" else ""
+
+        Text("退出登录？ $newName")
     }
 }
