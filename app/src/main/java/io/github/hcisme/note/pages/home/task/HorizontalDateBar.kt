@@ -10,6 +10,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,11 @@ import io.github.hcisme.note.utils.DateUtil.shortWeekdays
 fun HorizontalDateBar() {
     val taskVM: TaskViewModel = viewModel()
     val monthDates = taskVM.monthDates
+
+    DisposableEffect(Unit) {
+        hackTabMinWidth()
+        onDispose { }
+    }
 
     ScrollableTabRow(
         selectedTabIndex = taskVM.selectedTabIndex,
@@ -52,4 +58,15 @@ fun HorizontalDateBar() {
             }
         }
     }
+}
+
+/**
+ * ScrollableTab内部设置了单个 tab 的最小宽度 ScrollableTabRowMinimumTabWidth 为90，且属性无法自定义
+ * https://issuetracker.google.com/issues/218684743 (Won't Fix)
+ */
+private fun hackTabMinWidth() {
+    val clazz = Class.forName("androidx.compose.material3.TabRowKt")
+    val field = clazz.getDeclaredField("ScrollableTabRowMinimumTabWidth")
+    field.isAccessible = true
+    field.set(null, 64f)
 }

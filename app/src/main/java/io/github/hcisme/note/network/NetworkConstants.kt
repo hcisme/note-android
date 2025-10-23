@@ -1,4 +1,4 @@
-package io.github.hcisme.note.constants
+package io.github.hcisme.note.network
 
 import io.github.hcisme.note.BuildConfig
 

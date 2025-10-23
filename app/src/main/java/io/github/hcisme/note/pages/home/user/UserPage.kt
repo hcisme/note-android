@@ -39,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.Dialog
-import io.github.hcisme.note.constants.NavigationName
+import io.github.hcisme.note.navigation.NavigationName
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken

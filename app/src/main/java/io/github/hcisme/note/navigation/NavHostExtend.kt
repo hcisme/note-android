@@ -1,7 +1,7 @@
 package io.github.hcisme.note.navigation
 
 import androidx.navigation.NavHostController
-import io.github.hcisme.note.constants.NavigationName
+import io.github.hcisme.note.navigation.NavigationName
 
 /**
  * 导航到 编辑 TodoItem 界面

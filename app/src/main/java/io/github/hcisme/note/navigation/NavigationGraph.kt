@@ -2,20 +2,23 @@ package io.github.hcisme.note.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import io.github.hcisme.note.constants.NavigationName
 import io.github.hcisme.note.pages.home.HomePage
 import io.github.hcisme.note.pages.login.LoginPage
 import io.github.hcisme.note.pages.todoform.TodoFormPage
@@ -23,22 +26,22 @@ import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.getToken
 
-private const val AnimationInDuration = 300
-private const val AnimationOutDuration = 280
-private val AnimationEasing = LinearOutSlowInEasing
-private val enterTransition = slideInHorizontally(
-    animationSpec = tween(AnimationInDuration, easing = AnimationEasing),
-    initialOffsetX = { it }
-)
-private val exitTransition = slideOutHorizontally(
-    animationSpec = tween(AnimationOutDuration, easing = AnimationEasing),
-    targetOffsetX = { it }
-)
-
 @Composable
 fun NavigationGraph(modifier: Modifier = Modifier) {
     val navController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
+    val enterTransition = remember {
+        slideInVertically(
+            animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+            initialOffsetY = { it / 3 }
+        ) + fadeIn(animationSpec = tween(durationMillis = 600))
+    }
+    val exitTransition = remember {
+        slideOutVertically(
+            animationSpec = tween(durationMillis = 600, easing = FastOutLinearInEasing),
+            targetOffsetY = { it }
+        ) + fadeOut(animationSpec = tween(durationMillis = 280))
+    }
 
     NavHost(
         modifier = modifier

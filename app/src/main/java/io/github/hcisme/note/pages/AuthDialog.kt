@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.github.hcisme.note.components.Dialog
-import io.github.hcisme.note.constants.NavigationName
+import io.github.hcisme.note.navigation.NavigationName
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken

@@ -12,8 +12,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.components.NotificationPopup
-import io.github.hcisme.note.constants.NetworkConstants
 import io.github.hcisme.note.navigation.NavigationGraph
+import io.github.hcisme.note.network.NetworkConstants
 import io.github.hcisme.note.network.Request
 import io.github.hcisme.note.pages.AuthDialog
 import io.github.hcisme.note.pages.rememberAuthManager

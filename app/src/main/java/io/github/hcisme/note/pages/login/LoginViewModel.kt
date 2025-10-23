@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.enums.Message
+import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.network.CaptchaService
 import io.github.hcisme.note.network.UserService
 import io.github.hcisme.note.network.model.LoginRequest
@@ -43,6 +44,7 @@ class LoginViewModel(private val application: Application) : AndroidViewModel(ap
 
         viewModelScope.launch {
             safeRequestCall(
+                isShowErrorInfo = false,
                 call = {
                     withContext(Dispatchers.IO) {
                         UserService.login(
@@ -55,8 +57,14 @@ class LoginViewModel(private val application: Application) : AndroidViewModel(ap
                         )
                     }
                 },
-                onStatusCodeError = { getCaptcha() },
+                onStatusCodeError = { result ->
+                    NotificationManager.showNotification(result.info)
+                    getCaptcha()
+                },
                 onFinally = { isLoginIng = false },
+                onError = {
+                    NotificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
+                },
                 onSuccess = { result ->
                     val data = result.data
                     val token = data.token

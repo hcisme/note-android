@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.hcisme.note.components.NotificationManager
-import io.github.hcisme.note.constants.NetworkConstants
 import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.pages.AuthManager
 import kotlinx.coroutines.Dispatchers
@@ -118,7 +117,7 @@ suspend fun <T> safeRequestCall(
     isShowErrorInfo: Boolean = true,
     call: suspend () -> BaseResult<T>,
     onError: () -> Unit = {},
-    onStatusCodeError: (code: Int) -> Unit = {},
+    onStatusCodeError: (result: BaseResult<T>) -> Unit = {},
     onFinally: () -> Unit = {},
     onSuccess: (result: BaseResult<T>) -> Unit = {}
 ) {
@@ -130,7 +129,7 @@ suspend fun <T> safeRequestCall(
             if (isShowErrorInfo) {
                 NotificationManager.showNotification(ResponseCodeEnum.CODE_501.msg)
             }
-            onStatusCodeError(result.code)
+            onStatusCodeError(result)
         }
     } catch (e: Exception) {
         val networkError = NetworkErrorHandler.handleException(e)

@@ -1,4 +1,4 @@
-package io.github.hcisme.note.constants
+package io.github.hcisme.note.navigation
 
 object NavigationName {
     const val LOGIN_PAGE = "/login"
