@@ -9,13 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.pages.home.task.TaskPage
 import io.github.hcisme.note.pages.home.user.UserPage
 
@@ -23,7 +20,7 @@ import io.github.hcisme.note.pages.home.user.UserPage
 fun HomePage(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val holder = rememberSaveableStateHolder()
-    var currentPage by remember { mutableIntStateOf(0) }
+    val homeVM = viewModel<HomeViewModel>()
 
     Column(
         modifier = modifier
@@ -36,14 +33,14 @@ fun HomePage(modifier: Modifier = Modifier) {
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            holder.SaveableStateProvider(currentPage) {
-                when (currentPage) {
+            holder.SaveableStateProvider(homeVM.currentPage) {
+                when (homeVM.currentPage) {
                     0 -> TaskPage()
                     1 -> UserPage()
                 }
             }
         }
-        BottomBar(currentPage = currentPage) { currentPage = it }
+        BottomBar(currentPage = homeVM.currentPage) { homeVM.changePage(page = it) }
     }
 
     BackHandler {

@@ -1,7 +1,6 @@
 package io.github.hcisme.note.navigation
 
 import androidx.navigation.NavHostController
-import io.github.hcisme.note.navigation.NavigationName
 
 /**
  * 导航到 编辑 TodoItem 界面
@@ -31,4 +30,11 @@ fun NavHostController.navigateToHomeAndClearStack() {
  */
 fun NavHostController.navigateToHome() {
     navigate(NavigationName.HOME_PAGE)
+}
+
+/**
+ * 导航到 编辑 TodoItem 界面
+ */
+fun NavHostController.navigateToSetting() {
+    navigate(NavigationName.SETTING_PAGE)
 }

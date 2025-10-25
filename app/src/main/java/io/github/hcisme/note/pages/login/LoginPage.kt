@@ -47,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.AnimatedLabelText
 import io.github.hcisme.note.components.RotationIcon
+import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.navigation.navigateToHomeAndClearStack
 import io.github.hcisme.note.utils.LocalNavController
 
@@ -76,6 +77,24 @@ fun LoginPage() {
                 .align(Alignment.TopCenter)
                 .padding(top = 32.dp)
         )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = "version: v${VersionConstant.NAME}",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+            )
+            Text(
+                text = "code: ${VersionConstant.CODE}",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+            )
+        }
 
         Column(
             modifier = Modifier

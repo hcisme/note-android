@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import io.github.hcisme.note.pages.home.HomePage
 import io.github.hcisme.note.pages.login.LoginPage
+import io.github.hcisme.note.pages.setting.SettingPage
 import io.github.hcisme.note.pages.todoform.TodoFormPage
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
@@ -34,7 +35,7 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
         slideInVertically(
             animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
             initialOffsetY = { it / 3 }
-        ) + fadeIn(animationSpec = tween(durationMillis = 600))
+        ) + fadeIn(animationSpec = tween(durationMillis = 400))
     }
     val exitTransition = remember {
         slideOutVertically(
@@ -78,6 +79,15 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
             val idString = backStackEntry.arguments?.getString("id")
             val id = idString?.toLongOrNull()
             TodoFormPage(id = id)
+        }
+
+        composable(
+            route = NavigationName.SETTING_PAGE,
+            enterTransition = { enterTransition },
+            popEnterTransition = null,
+            popExitTransition = { exitTransition }
+        ) {
+            SettingPage()
         }
     }
 }

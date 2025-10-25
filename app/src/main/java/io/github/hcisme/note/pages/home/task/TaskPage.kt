@@ -45,7 +45,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = { HomeTaskTopBar() }
     ) { innerPadding ->
         val contentPadding = PaddingValues(

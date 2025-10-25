@@ -5,21 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DividerDefaults
@@ -29,29 +24,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.hcisme.note.components.Dialog
-import io.github.hcisme.note.navigation.NavigationName
+import io.github.hcisme.note.navigation.navigateToSetting
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
-import io.github.hcisme.note.utils.clearToken
-import io.github.hcisme.note.utils.clearUserInfo
 import io.github.hcisme.note.utils.getUserInfo
+import io.github.hcisme.note.utils.noRippleClickable
 
 @Composable
 fun UserPage(modifier: Modifier = Modifier) {
     val navHostController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
     val userVM = viewModel<UserViewModel>()
-    var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         userVM.userInfo = sharedPreferences.getUserInfo()
@@ -149,61 +137,34 @@ fun UserPage(modifier: Modifier = Modifier) {
                             )
                         }
                     }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 20.dp),
+                        thickness = DividerDefaults.Thickness,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .noRippleClickable { navHostController.navigateToSetting() },
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "设置",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = "设置",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
                 }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // 退出登录按钮 - 固定在底部
-            Button(
-                onClick = { showLogoutDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .height(56.dp)
-                    .align(alignment = Alignment.CenterHorizontally),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                    contentDescription = "退出登录"
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "退出登录",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
             }
         }
-    }
-
-    Dialog(
-        visible = showLogoutDialog,
-        confirmButtonText = "确定",
-        cancelButtonText = "取消",
-        onConfirm = {
-            userVM.logout(
-                onFinally = {
-                    sharedPreferences.clearToken()
-                    sharedPreferences.clearUserInfo()
-                }
-            )
-            showLogoutDialog = false
-            navHostController.navigate(NavigationName.LOGIN_PAGE) {
-                popUpTo(NavigationName.HOME_PAGE) {
-                    inclusive = true
-                }
-            }
-        },
-        onDismissRequest = { showLogoutDialog = false }
-    ) {
-        val username = userVM.userInfo?.username
-        val newName = if (username != null) "@$username" else ""
-
-        Text("退出登录？ $newName")
     }
 }

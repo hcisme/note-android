@@ -6,4 +6,6 @@ object NavigationName {
     const val HOME_PAGE = "/"
 
     const val TODO_FORM_PAGE = "/todo_form"
+
+    const val SETTING_PAGE = "/setting"
 }
