@@ -66,7 +66,7 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
             return
         }
 
-        Toast.makeText(application, "下载开始", Toast.LENGTH_SHORT).show()
+        Toast.makeText(application, "下载开始", Toast.LENGTH_LONG).show()
         DownloadProgressManager.updateProgress(0f)
         viewModelScope.launch {
             apkDownloadManager.downloadApk(
@@ -83,7 +83,11 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                 },
                 onError = { throwable ->
                     onError(throwable.message ?: "")
-                    Log.e("@Note APK下载异常", "下载失败: ${throwable.message}", throwable)
+                    Log.e(
+                        "${Constant.APP_LOG_TAG} APK下载异常",
+                        "下载失败: ${throwable.message}",
+                        throwable
+                    )
                 }
             )
         }

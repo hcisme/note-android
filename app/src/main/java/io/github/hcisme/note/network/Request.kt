@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.hcisme.note.components.NotificationManager
+import io.github.hcisme.note.constants.Constant
 import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.pages.AuthManager
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +103,7 @@ object Request {
                         authManager.showLoginDialog()
                     }
                 } catch (e: Exception) {
-                    Log.e("Note FormatError", "${e.message}", e)
+                    Log.e("${Constant.APP_LOG_TAG} FormatError", "${e.message}", e)
                 }
 
                 // 重建response供后续处理
@@ -121,7 +122,7 @@ object Request {
             chain.proceed(chain.request())
         } catch (e: Exception) {
             val networkError = NetworkErrorHandler.handleException(e)
-            Log.e("Note InterceptorError", networkError.message, e)
+            Log.e("${Constant.APP_LOG_TAG} InterceptorError", networkError.message, e)
             throw e
         }
     }
@@ -150,7 +151,7 @@ suspend fun <T> safeRequestCall(
         if (isShowErrorInfo) {
             NotificationManager.showNotification(networkError.message)
         }
-        Log.e("Note Request Error", networkError.message, e)
+        Log.e("${Constant.APP_LOG_TAG} Request Error", networkError.message, e)
         onError()
     } finally {
         onFinally()

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import io.github.hcisme.note.constants.Constant
 import java.io.File
 
 class InstallManager(private val context: Context) {
@@ -41,7 +42,7 @@ class InstallManager(private val context: Context) {
             }
 
         } catch (e: Exception) {
-            Log.e("@Note 安装异常", e.message, e)
+            Log.e(Constant.APP_LOG_TAG, e.message, e)
             Toast.makeText(context, "安装失败: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
