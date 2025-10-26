@@ -14,7 +14,7 @@ import io.github.hcisme.note.network.CaptchaService
 import io.github.hcisme.note.network.UserService
 import io.github.hcisme.note.network.model.LoginRequest
 import io.github.hcisme.note.network.safeRequestCall
-import io.github.hcisme.note.utils.base64ToImageBitmap
+import io.github.hcisme.note.utils.ImageUtil
 import io.github.hcisme.note.utils.getSps
 import io.github.hcisme.note.utils.saveToken
 import io.github.hcisme.note.utils.saveUserInfo
@@ -84,7 +84,7 @@ class LoginViewModel(private val application: Application) : AndroidViewModel(ap
             safeRequestCall(
                 call = { withContext(Dispatchers.IO) { CaptchaService.getCaptcha() } },
                 onSuccess = { result ->
-                    captchaBitmap = base64ToImageBitmap(result.data.captcha)
+                    captchaBitmap = ImageUtil.base64ToImageBitmap(result.data.captcha)
                     captchaKey = result.data.captchaKey
                 }
             )

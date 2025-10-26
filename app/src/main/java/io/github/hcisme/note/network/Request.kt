@@ -1,14 +1,11 @@
 package io.github.hcisme.note.network
 
-import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.enums.ResponseCodeEnum
-import io.github.hcisme.note.network.api.VersionApi
 import io.github.hcisme.note.pages.AuthManager
-import io.github.hcisme.note.utils.getToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
@@ -144,26 +141,4 @@ suspend fun <T> safeRequestCall(
     } finally {
         onFinally()
     }
-}
-
-/**
- * 单独对下载文件接口
- */
-fun createVersionApiService(sharedPreferences: SharedPreferences): VersionApi {
-    val client = OkHttpClient.Builder()
-        .addInterceptor { chain ->
-            val originalRequest = chain.request()
-            val requestBuilder = originalRequest.newBuilder()
-            sharedPreferences.getToken()?.let {
-                requestBuilder.addHeader("token", it)
-            }
-            chain.proceed(requestBuilder.build())
-        }
-        .build()
-
-    return Retrofit.Builder()
-        .baseUrl(NetworkConstants.BASE_URL)
-        .client(client)
-        .build()
-        .create(VersionApi::class.java)
 }

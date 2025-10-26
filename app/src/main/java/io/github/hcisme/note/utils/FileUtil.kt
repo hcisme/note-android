@@ -5,7 +5,7 @@ import java.io.FileInputStream
 import java.security.DigestInputStream
 import java.security.MessageDigest
 
-object FileTools {
+object FileUtil {
     /**
      * 计算文件的 MD5 值，返回小写十六进制字符串
      * 使用 DigestInputStream 来在读文件的同时更新摘要，适合大文件。

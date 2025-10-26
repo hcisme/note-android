@@ -1,5 +1,6 @@
 package io.github.hcisme.note.pages.setting
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,17 +39,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.Dialog
-import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.navigation.NavigationName
 import io.github.hcisme.note.pages.home.user.UserViewModel
+import io.github.hcisme.note.utils.InstallManager
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken
 import io.github.hcisme.note.utils.clearUserInfo
 import io.github.hcisme.note.utils.getUserInfo
 import io.github.hcisme.note.utils.withBadge
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,9 +57,9 @@ fun SettingPage(modifier: Modifier = Modifier) {
     val density = LocalDensity.current
     val navHostController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
-    val scope = rememberCoroutineScope()
     val userVM = viewModel<UserViewModel>()
     val settingVM = viewModel<SettingViewModel>()
+    val installManager = remember { InstallManager(context = context) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
 
@@ -97,9 +96,12 @@ fun SettingPage(modifier: Modifier = Modifier) {
         ) {
             ListItem(
                 modifier = Modifier.clickable {
-                    if (settingVM.updateVersionInfo != null) {
-                        showUpdateDialog = true
+                    if (settingVM.updateVersionInfo == null) {
+                        Toast.makeText(context, "您的应用已经是最新版本了", Toast.LENGTH_SHORT)
+                            .show()
+                        return@clickable
                     }
+                    showUpdateDialog = true
                 },
                 headlineContent = {
                     Text(
@@ -139,7 +141,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
             Button(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 32.dp)
                     .fillMaxWidth(0.8f)
                     .height(56.dp)
                     .align(alignment = Alignment.CenterHorizontally),
@@ -200,12 +202,12 @@ fun SettingPage(modifier: Modifier = Modifier) {
             Text("更新内容 $versionName $versionCode")
         },
         onConfirm = {
-            scope.launch {
-                settingVM.download(
-                    onSuccess = { file -> installApk(context = context, apkFile = file) },
-                    onError = { NotificationManager.showNotification("更新APP失败") }
-                )
-            }
+            settingVM.download(
+                onSuccess = { file ->
+                    installManager.installApk(apkFile = file)
+                },
+                onError = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+            )
             showUpdateDialog = false
         },
         onDismissRequest = { showUpdateDialog = false }
