@@ -52,7 +52,7 @@ object Request {
     inline fun <reified T> createService(): T = retrofit.create(T::class.java)
 
     /**
-     * 请求拦截器（添加公共参数/头部）
+     * 请求拦截器
      */
     private fun createRequestInterceptor() = Interceptor { chain ->
         val originalRequest = chain.request()

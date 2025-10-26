@@ -17,6 +17,7 @@ import io.github.hcisme.note.network.VersionService
 import io.github.hcisme.note.network.model.VersionModel
 import io.github.hcisme.note.network.safeRequestCall
 import io.github.hcisme.note.utils.ApkDownloadManager
+import io.github.hcisme.note.utils.DownloadProgressManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -65,6 +66,8 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
             return
         }
 
+        Toast.makeText(application, "下载开始", Toast.LENGTH_SHORT).show()
+        DownloadProgressManager.updateProgress(0f)
         viewModelScope.launch {
             apkDownloadManager.downloadApk(
                 versionCode = versionCode,
@@ -75,7 +78,7 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                 },
                 onProgress = { progress -> onProgress(progress) },
                 onSuccess = {
-                    Toast.makeText(application, "下载完成", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, "下载完成", Toast.LENGTH_LONG).show()
                     onSuccess(it)
                 },
                 onError = { throwable ->

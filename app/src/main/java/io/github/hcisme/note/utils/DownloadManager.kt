@@ -3,11 +3,14 @@ package io.github.hcisme.note.utils
 import android.content.Context
 import android.os.Environment
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.google.gson.Gson
 import io.github.hcisme.note.constants.Constant
+import io.github.hcisme.note.network.BaseResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
 import okhttp3.ResponseBody
 import retrofit2.Response
 import java.io.File
@@ -16,6 +19,8 @@ import java.io.File
  * 下载管理器
  */
 class DownloadManager(private val context: Context) {
+    private val gson = Gson()
+
     suspend fun downloadFile(
         downloadRequest: suspend () -> Response<ResponseBody>,
         fileName: String,
@@ -49,6 +54,13 @@ class DownloadManager(private val context: Context) {
             }
 
             response.body()?.let { body ->
+                val contentType = body.contentType()
+                val isFileStream = isFileStreamResponse(contentType, response)
+
+                if (!isFileStream) {
+                    return@withContext handleJsonResponse(body)
+                }
+
                 val contentLength = body.contentLength()
                 var totalBytesRead = 0L
 
@@ -87,13 +99,53 @@ class DownloadManager(private val context: Context) {
             Result.failure(e)
         }
     }
+
+    /**
+     * 判断响应是否为文件流
+     */
+    private fun isFileStreamResponse(
+        contentType: MediaType?,
+        response: Response<ResponseBody>
+    ): Boolean {
+        //通过 Content-Type 判断
+        val isStreamContentType = contentType?.let { type ->
+            when {
+                type.type == "application" && type.subtype == "octet-stream" -> true
+                type.type == "application" && type.subtype.contains("zip") -> true
+                type.type == "application" && type.subtype.contains("pdf") -> true
+                type.type == "image" -> true
+                type.type == "audio" -> true
+                type.type == "video" -> true
+                else -> false
+            }
+        } ?: false
+
+        //通过响应头判断
+        val contentDisposition = response.headers()["Content-Disposition"]
+        val isAttachment = contentDisposition?.contains("attachment") == true
+
+        return isStreamContentType || isAttachment
+    }
+
+    /**
+     * 处理 JSON 错误响应
+     */
+    private fun handleJsonResponse(body: ResponseBody): Result<File> {
+        return try {
+            val responseString = body.string()
+            val baseResult = gson.fromJson(responseString, BaseResult::class.java)
+            Result.failure(Exception(baseResult.info))
+        } catch (e: Exception) {
+            Result.failure(Exception("响应解析错误: ${e.message}"))
+        }
+    }
 }
 
 /**
  * 下载进度管理器
  */
 object DownloadProgressManager {
-    var downloadProgress by mutableFloatStateOf(0f)
+    var downloadProgress by mutableStateOf<Float?>(null)
         private set
 
     fun updateProgress(progress: Float) {
@@ -101,6 +153,6 @@ object DownloadProgressManager {
     }
 
     fun resetProgress() {
-        downloadProgress = 0f
+        downloadProgress = null
     }
 }

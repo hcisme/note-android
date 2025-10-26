@@ -136,7 +136,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
                             )
                         }
-                        if (DownloadProgressManager.downloadProgress != 0f && DownloadProgressManager.downloadProgress != 100f) {
+                        if (DownloadProgressManager.downloadProgress != null) {
                             Box(
                                 modifier = Modifier.width(72.dp),
                                 contentAlignment = Alignment.Center
