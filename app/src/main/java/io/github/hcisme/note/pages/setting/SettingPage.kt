@@ -141,7 +141,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
                                 modifier = Modifier.width(72.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("下载中${36}%")
+                                Text("下载中${DownloadProgressManager.downloadProgress}%")
                             }
                         }
                     }
