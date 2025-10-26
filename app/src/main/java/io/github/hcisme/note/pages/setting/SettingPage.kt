@@ -225,10 +225,15 @@ fun SettingPage(modifier: Modifier = Modifier) {
         },
         onConfirm = {
             settingVM.download(
+                onProgress = { DownloadProgressManager.updateProgress(it) },
                 onSuccess = { file ->
+                    DownloadProgressManager.resetProgress()
                     installManager.installApk(apkFile = file)
                 },
-                onError = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                onError = {
+                    DownloadProgressManager.resetProgress()
+                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                }
             )
             showUpdateDialog = false
         },

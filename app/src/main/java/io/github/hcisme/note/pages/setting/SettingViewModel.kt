@@ -17,7 +17,6 @@ import io.github.hcisme.note.network.VersionService
 import io.github.hcisme.note.network.model.VersionModel
 import io.github.hcisme.note.network.safeRequestCall
 import io.github.hcisme.note.utils.ApkDownloadManager
-import io.github.hcisme.note.utils.DownloadProgressManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -74,17 +73,12 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                 downloadCall = { code, name ->
                     VersionService.downloadNewVersionApp(code, name)
                 },
-                onProgress = { progress ->
-                    DownloadProgressManager.updateProgress(progress)
-                    onProgress(progress)
-                },
+                onProgress = { progress -> onProgress(progress) },
                 onSuccess = {
-                    DownloadProgressManager.resetProgress()
                     Toast.makeText(application, "下载完成", Toast.LENGTH_SHORT).show()
                     onSuccess(it)
                 },
                 onError = { throwable ->
-                    DownloadProgressManager.resetProgress()
                     onError(throwable.message ?: "")
                     Log.e("@Note APK下载异常", "下载失败: ${throwable.message}", throwable)
                 }
