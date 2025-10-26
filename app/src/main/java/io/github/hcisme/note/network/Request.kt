@@ -77,25 +77,39 @@ object Request {
         val responseBody = response.body
 
         responseBody?.let {
-            val source = it.source()
-            source.request(Long.MAX_VALUE)
-            val buffer = source.buffer.clone()
-            val responseString = buffer.readUtf8()
+            val contentType = responseBody.contentType()
+            val isStream = contentType?.type == "application" && (
+                    contentType.subtype == "octet-stream" ||
+                            contentType.subtype.contains("zip") ||
+                            contentType.subtype.contains("pdf") ||
+                            contentType.subtype.contains("image") ||
+                            response.request.url.toString().contains("/download/") // 特定下载端点
+                    )
 
-            try {
-                val type = object : TypeToken<BaseResult<*>>() {}.type
-                val baseResult = Gson().fromJson<BaseResult<*>>(responseString, type)
-                if (baseResult.code == ResponseCodeEnum.CODE_401.code) {
-                    authManager.showLoginDialog()
+            if (isStream) {
+                // 如果是流数据，直接返回原始响应
+                response
+            } else {
+                val source = it.source()
+                source.request(Long.MAX_VALUE)
+                val buffer = source.buffer.clone()
+                val responseString = buffer.readUtf8()
+
+                try {
+                    val type = object : TypeToken<BaseResult<*>>() {}.type
+                    val baseResult = Gson().fromJson<BaseResult<*>>(responseString, type)
+                    if (baseResult.code == ResponseCodeEnum.CODE_401.code) {
+                        authManager.showLoginDialog()
+                    }
+                } catch (e: Exception) {
+                    Log.e("Note FormatError", "${e.message}", e)
                 }
-            } catch (e: Exception) {
-                Log.e("Note FormatError", "${e.message}", e)
-            }
 
-            // 重建response供后续处理
-            response.newBuilder()
-                .body(responseString.toResponseBody(it.contentType()))
-                .build()
+                // 重建response供后续处理
+                response.newBuilder()
+                    .body(responseString.toResponseBody(it.contentType()))
+                    .build()
+            }
         } ?: response
     }
 

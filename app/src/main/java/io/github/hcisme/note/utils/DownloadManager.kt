@@ -67,7 +67,6 @@ class DownloadManager(private val context: Context) {
                                     (totalBytesRead * 100f / contentLength).coerceIn(0f, 100f)
                                 onProgress(progress)
                             }
-
                             bytesRead = inputStream.read(buffer)
                         }
                     }

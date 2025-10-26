@@ -96,5 +96,4 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 增加下载进度显示
-            - 优化代码
+            - 修复文件md5 hash验证问题

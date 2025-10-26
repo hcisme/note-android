@@ -15,7 +15,7 @@ object FileUtil {
         FileInputStream(file).use { fis ->
             DigestInputStream(fis, md).use { dis ->
                 // 8KB缓冲区
-                val buffer = ByteArray(8 * 1024)
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 while (dis.read(buffer) != -1) {
                     // 正常读取即可，DigestInputStream会自动处理哈希计算
                 }
