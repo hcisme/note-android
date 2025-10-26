@@ -63,6 +63,12 @@ fun NotificationPopup(
     val yOffsetPx = remember { with(density) { 100.dp.toPx() } }
     val xOffsetPx = remember(windowWidthPx) { (windowWidthPx / 2) - (contentPx / 2) }
 
+    EnhancedLifecycleAware(
+        onPaused = {
+            onDismiss()
+        }
+    )
+
     LaunchedEffect(notificationState.isVisible) {
         if (notificationState.isVisible) {
             delay(1400)

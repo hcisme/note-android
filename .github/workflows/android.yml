@@ -96,4 +96,4 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 修复文件md5 hash验证问题
+            - 修复提示框未正常销毁bug
