@@ -3,7 +3,9 @@ package io.github.hcisme.note.pages.setting
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,6 +44,7 @@ import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.navigation.NavigationName
 import io.github.hcisme.note.pages.home.user.UserViewModel
+import io.github.hcisme.note.utils.DownloadProgressManager
 import io.github.hcisme.note.utils.InstallManager
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
@@ -118,19 +121,38 @@ fun SettingPage(modifier: Modifier = Modifier) {
                     )
                 },
                 trailingContent = {
-                    Column {
-                        Text(
-                            text = "version_name: v${VersionConstant.NAME}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        )
-                        Text(
-                            text = "version_code: ${VersionConstant.CODE}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "version_name: v${VersionConstant.NAME}",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                            )
+                            Text(
+                                text = "version_code: ${VersionConstant.CODE}",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                            )
+                        }
+                        if (DownloadProgressManager.downloadProgress != 0f && DownloadProgressManager.downloadProgress != 100f) {
+                            Box(
+                                modifier = Modifier.width(72.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("下载中${36}%")
+                            }
+                        }
                     }
                 },
+                tonalElevation = 1.dp,
+                shadowElevation = 4.dp
+            )
+
+            ListItem(
+                modifier = Modifier.clickable { settingVM.clearCache() },
+                headlineContent = { Text(text = "清除缓存") },
                 tonalElevation = 1.dp,
                 shadowElevation = 4.dp
             )

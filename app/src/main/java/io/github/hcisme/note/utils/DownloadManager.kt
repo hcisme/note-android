@@ -2,14 +2,20 @@ package io.github.hcisme.note.utils
 
 import android.content.Context
 import android.os.Environment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.setValue
+import io.github.hcisme.note.constants.Constant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Response
 import java.io.File
 
+/**
+ * 下载管理器
+ */
 class DownloadManager(private val context: Context) {
-
     suspend fun downloadFile(
         downloadRequest: suspend () -> Response<ResponseBody>,
         fileName: String,
@@ -20,7 +26,7 @@ class DownloadManager(private val context: Context) {
             // 创建下载目录
             val downloadDir = File(
                 context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                "downloads"
+                Constant.INNER_DOWNLOAD_DIR_NAME
             ).apply { if (!exists()) mkdirs() }
 
             val outputFile = File(downloadDir, fileName)
@@ -81,5 +87,21 @@ class DownloadManager(private val context: Context) {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+}
+
+/**
+ * 下载进度管理器
+ */
+object DownloadProgressManager {
+    var downloadProgress by mutableFloatStateOf(0f)
+        private set
+
+    fun updateProgress(progress: Float) {
+        downloadProgress = progress
+    }
+
+    fun resetProgress() {
+        downloadProgress = 0f
     }
 }
