@@ -8,9 +8,7 @@ plugins {
 
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
-    if (file.exists()) {
-        file.inputStream().use { load(it) }
-    }
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 val debugBaseUrl: String by lazy {
     localProperties.getProperty("debug.base.url", System.getenv("DEBUG_BASE_URL"))
@@ -29,8 +27,8 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 32
-        versionName = "1.0.17"
+        versionCode = 33
+        versionName = "1.0.18"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -42,7 +42,6 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun download(
-        onProgress: (Float) -> Unit = {},
         onSuccess: (File) -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
@@ -76,7 +75,6 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                 downloadCall = { code, name ->
                     VersionService.downloadNewVersionApp(code, name)
                 },
-                onProgress = { progress -> onProgress(progress) },
                 onSuccess = {
                     Toast.makeText(application, "下载完成", Toast.LENGTH_LONG).show()
                     onSuccess(it)

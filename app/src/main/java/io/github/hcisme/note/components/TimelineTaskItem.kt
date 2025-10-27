@@ -5,18 +5,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
@@ -45,7 +45,7 @@ fun TimelineTaskItem(
     item: TodoItemModel,
     isCurrent: Boolean,
     isLast: Boolean,
-    minHeight: Dp = 160.dp,
+    height: Dp = 200.dp,
     onClick: () -> Unit = {},
     onClickDelete: () -> Unit = {}
 ) {
@@ -55,8 +55,7 @@ fun TimelineTaskItem(
         modifier = modifier
             .padding(top = 12.dp)
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .heightIn(min = minHeight)
+            .height(height)
     ) {
         Column(
             modifier = Modifier
@@ -122,7 +121,7 @@ fun TimelineTaskItem(
         Card(
             modifier = Modifier
                 .weight(1f)
-                .heightIn(min = minHeight)
+                .fillMaxHeight()
                 .clip(RoundedCornerShape(16.dp))
                 .clickable(
                     indication = null,
@@ -148,11 +147,7 @@ fun TimelineTaskItem(
                     )
                     Text(text = item.content)
 
-                    Spacer(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(vertical = 4.dp)
-                    )
+                    Spacer(modifier = Modifier.weight(1f))
 
                     Text(
                         text = "开始时间：${item.startTime}",

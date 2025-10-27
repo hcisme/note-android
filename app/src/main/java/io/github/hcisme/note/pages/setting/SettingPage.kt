@@ -225,7 +225,6 @@ fun SettingPage(modifier: Modifier = Modifier) {
         },
         onConfirm = {
             settingVM.download(
-                onProgress = { DownloadProgressManager.updateProgress(it) },
                 onSuccess = { file ->
                     DownloadProgressManager.resetProgress()
                     installManager.installApk(apkFile = file)

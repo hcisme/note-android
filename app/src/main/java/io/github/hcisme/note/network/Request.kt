@@ -7,6 +7,7 @@ import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.constants.Constant
 import io.github.hcisme.note.enums.ResponseCodeEnum
 import io.github.hcisme.note.pages.AuthManager
+import io.github.hcisme.note.utils.DownloadProgressManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
@@ -32,9 +33,9 @@ object Request {
         this.tokenProvider = tokenProvider
 
         val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(NetworkConstants.CONNECT_TIMEOUT, TimeUnit.SECONDS)
-            .readTimeout(NetworkConstants.READ_TIMEOUT, TimeUnit.SECONDS)
-            .writeTimeout(NetworkConstants.WRITE_TIMEOUT, TimeUnit.SECONDS)
+            .connectTimeout(NetworkConstants.CONNECT_TIMEOUT, TimeUnit.MINUTES)
+            .readTimeout(NetworkConstants.READ_TIMEOUT, TimeUnit.MINUTES)
+            .writeTimeout(NetworkConstants.WRITE_TIMEOUT, TimeUnit.MINUTES)
             .addInterceptor(createRequestInterceptor())
             .addInterceptor(createResponseInterceptor(authManager))
             .addInterceptor(createNetworkErrorInterceptor())
@@ -77,7 +78,7 @@ object Request {
         val response = chain.proceed(chain.request())
         val responseBody = response.body
 
-        responseBody?.let {
+        responseBody?.let { body ->
             val contentType = responseBody.contentType()
             val isStream = contentType?.type == "application" && (
                     contentType.subtype == "octet-stream" ||
@@ -88,10 +89,15 @@ object Request {
                     )
 
             if (isStream) {
-                // 如果是流数据，直接返回原始响应
-                response
+                val progressBody = ProgressResponseBody(
+                    url = response.request.url.toString(),
+                    responseBody = body
+                ) { url, percent, bytesRead, contentLength ->
+                    DownloadProgressManager.updateProgress(percent.toFloat())
+                }
+                response.newBuilder().body(progressBody).build()
             } else {
-                val source = it.source()
+                val source = body.source()
                 source.request(Long.MAX_VALUE)
                 val buffer = source.buffer.clone()
                 val responseString = buffer.readUtf8()
@@ -108,7 +114,7 @@ object Request {
 
                 // 重建response供后续处理
                 response.newBuilder()
-                    .body(responseString.toResponseBody(it.contentType()))
+                    .body(responseString.toResponseBody(body.contentType()))
                     .build()
             }
         } ?: response

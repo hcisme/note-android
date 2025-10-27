@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -30,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,23 +41,34 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.DateTimePickerPopup
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.components.RotationIcon
+import io.github.hcisme.note.components.keyboardHeightCalculator
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.formatWithPattern
 import io.github.hcisme.note.utils.noRippleClickable
 import io.github.hcisme.note.utils.toLocalDateTime
 import io.github.hcisme.note.utils.withBadge
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoFormPage(id: Long? = null) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val navHostController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    val verticalScrollState = rememberScrollState()
+    val keyboardHeight = keyboardHeightCalculator()
     val todoFormVM = viewModel<TodoFormViewModel>()
     val isEdit = remember(id) { id != null }
 
@@ -71,6 +86,12 @@ fun TodoFormPage(id: Long? = null) {
         }
     }
 
+    LaunchedEffect(keyboardHeight) {
+        if (keyboardHeight == 0.dp) {
+            focusManager.clearFocus()
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -82,7 +103,12 @@ fun TodoFormPage(id: Long? = null) {
                             if (todoFormVM.haveChangedForm) {
                                 dialogVisible = true
                             } else {
-                                navHostController.popBackStack()
+                                scope.launch {
+                                    focusManager.clearFocus()
+                                    keyboardController?.hide()
+                                    delay(300)
+                                    navHostController.popBackStack()
+                                }
                             }
                         }
                     ) {
@@ -114,13 +140,26 @@ fun TodoFormPage(id: Long? = null) {
                 }
             )
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
+        val contentPadding = PaddingValues(
+            start = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
+            top = innerPadding.calculateTopPadding(),
+            end = innerPadding.calculateRightPadding(LayoutDirection.Ltr),
+            bottom = 0.dp
+        )
+
         Column(
             modifier = Modifier
+                .padding(bottom = keyboardHeight)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)
+                .noRippleClickable {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                }
+                .padding(contentPadding)
                 .padding(16.dp)
+                .verticalScroll(verticalScrollState),
         ) {
             // 标题输入
             Text(
@@ -139,7 +178,9 @@ fun TodoFormPage(id: Long? = null) {
                     todoFormVM.onValuesChange(todoFormVM.item.copy(title = it))
                 },
                 placeholder = { Text("请输入标题") },
-                modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .fillMaxWidth(),
                 isError = todoFormVM.errorMap.containsKey("title"),
                 supportingText = {
                     if (todoFormVM.errorMap.containsKey("title")) {
@@ -352,8 +393,13 @@ fun TodoFormPage(id: Long? = null) {
         confirmButtonText = "确定",
         cancelButtonText = "取消",
         onConfirm = {
-            dialogVisible = false
-            navHostController.popBackStack()
+            scope.launch {
+                dialogVisible = false
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                delay(300)
+                navHostController.popBackStack()
+            }
         },
         onDismissRequest = { dialogVisible = false },
     ) {
