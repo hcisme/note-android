@@ -41,7 +41,7 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
         slideOutVertically(
             animationSpec = tween(durationMillis = 600, easing = FastOutLinearInEasing),
             targetOffsetY = { it }
-        ) + fadeOut(animationSpec = tween(durationMillis = 280))
+        ) + fadeOut(animationSpec = tween(durationMillis = 320))
     }
 
     NavHost(
