@@ -65,7 +65,7 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
             return
         }
 
-        Toast.makeText(application, "下载开始", Toast.LENGTH_LONG).show()
+        Toast.makeText(application, "下载开始", Toast.LENGTH_SHORT).show()
         DownloadProgressManager.updateProgress(0f)
         viewModelScope.launch {
             apkDownloadManager.downloadApk(
@@ -76,7 +76,7 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                     VersionService.downloadNewVersionApp(code, name)
                 },
                 onSuccess = {
-                    Toast.makeText(application, "下载完成", Toast.LENGTH_LONG).show()
+                    Toast.makeText(application, "下载完成", Toast.LENGTH_SHORT).show()
                     onSuccess(it)
                 },
                 onError = { throwable ->

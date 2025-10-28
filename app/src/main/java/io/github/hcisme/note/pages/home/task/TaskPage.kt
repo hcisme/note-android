@@ -6,13 +6,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,6 +34,7 @@ import io.github.hcisme.note.components.TimelineTaskItem
 import io.github.hcisme.note.navigation.navigateToTodoForm
 import io.github.hcisme.note.utils.LocalNavController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskPage(modifier: Modifier = Modifier) {
     val navHostController = LocalNavController.current
@@ -59,65 +63,75 @@ fun TaskPage(modifier: Modifier = Modifier) {
         ) {
             HorizontalDateBar()
 
-            if (taskVM.todoList.isEmpty() && !taskVM.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+            PullToRefreshBox(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.background),
+                isRefreshing = taskVM.isLoading,
+                onRefresh = { taskVM.getTodoList() }
+            ) {
+                if (taskVM.todoList.isEmpty() && !taskVM.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            modifier = Modifier.size(64.dp),
-                            painter = painterResource(R.drawable.nothing),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = "暂无数据",
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                            style = MaterialTheme.typography.labelMedium
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                modifier = Modifier.size(64.dp),
+                                painter = painterResource(R.drawable.nothing),
+                                contentDescription = null
+                            )
+                            Text(
+                                text = "暂无数据",
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
                     }
-                }
-            } else {
-                var currentSelectTodoId by remember { mutableStateOf<Long?>(null) }
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {}
+                } else {
+                    var currentSelectTodoId by remember { mutableStateOf<Long?>(null) }
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    itemsIndexed(taskVM.todoList) { index, it ->
-                        TimelineTaskItem(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            item = it,
-                            isCurrent = index == 0,
-                            isLast = index == taskVM.todoList.size - 1,
-                            onClick = {
-                                navHostController.navigateToTodoForm(id = it.id)
-                            },
-                            onClickDelete = {
-                                currentSelectTodoId = it.id
-                                taskVM.deleteDialogVisible = true
-                            }
-                        )
-                    }
-                }
-
-                Dialog(
-                    visible = taskVM.deleteDialogVisible,
-                    confirmButtonText = "确定",
-                    cancelButtonText = "取消",
-                    onConfirm = {
-                        currentSelectTodoId?.let {
-                            taskVM.deleteDialogVisible = false
-                            taskVM.deleteTodoItemById(
-                                id = it,
-                                onSuccess = {
-                                    currentSelectTodoId = null
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        itemsIndexed(taskVM.todoList) { index, it ->
+                            TimelineTaskItem(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                item = it,
+                                isCurrent = index == 0,
+                                isLast = index == taskVM.todoList.size - 1,
+                                onClick = {
+                                    navHostController.navigateToTodoForm(id = it.id)
+                                },
+                                onClickDelete = {
+                                    currentSelectTodoId = it.id
+                                    taskVM.deleteDialogVisible = true
                                 }
                             )
                         }
-                    },
-                    onDismissRequest = { taskVM.deleteDialogVisible = false }
-                ) {
-                    Text(text = "确定删除吗")
+                    }
+
+                    Dialog(
+                        visible = taskVM.deleteDialogVisible,
+                        confirmButtonText = "确定",
+                        cancelButtonText = "取消",
+                        onConfirm = {
+                            currentSelectTodoId?.let {
+                                taskVM.deleteDialogVisible = false
+                                taskVM.deleteTodoItemById(
+                                    id = it,
+                                    onSuccess = {
+                                        currentSelectTodoId = null
+                                    }
+                                )
+                            }
+                        },
+                        onDismissRequest = { taskVM.deleteDialogVisible = false }
+                    ) {
+                        Text(text = "确定删除吗")
+                    }
                 }
             }
         }
