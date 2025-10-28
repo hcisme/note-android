@@ -2,7 +2,6 @@ package io.github.hcisme.note.pages.todoform
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,10 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -158,7 +157,7 @@ fun TodoFormPage(id: Long? = null) {
                     keyboardController?.hide()
                 }
                 .padding(contentPadding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .verticalScroll(verticalScrollState),
         ) {
             // 标题输入
@@ -189,7 +188,7 @@ fun TodoFormPage(id: Long? = null) {
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 完成状态单选按钮
             Text(
@@ -239,7 +238,7 @@ fun TodoFormPage(id: Long? = null) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 开始时间选择
             Text(
@@ -252,35 +251,31 @@ fun TodoFormPage(id: Long? = null) {
                     offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
                 )
             )
-            Row(
+            OutlinedTextField(
+                value = todoFormVM.item.startTime,
+                onValueChange = {},
+                readOnly = true,
+                placeholder = { Text("点击输入开始时间") },
+                trailingIcon = {
+                    IconButton(onClick = { startTimeVisible = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
+                },
                 modifier = Modifier
-                    .padding(top = 8.dp)
+                    .padding(top = 4.dp)
                     .fillMaxWidth()
-                    .height(40.dp)
-                    .border(
-                        width = 1.dp,
-                        color = if (todoFormVM.errorMap.containsKey("startTime")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
-                        shape = RoundedCornerShape(4.dp)
-                    )
                     .onGloballyPositioned { coords ->
                         startTimeAnchorBoundsPx = coords.boundsInWindow()
+                    },
+                supportingText = {
+                    if (todoFormVM.errorMap.containsKey("startTime")) {
+                        Text(text = todoFormVM.errorMap.getValue("startTime"))
                     }
-                    .noRippleClickable { startTimeVisible = true }
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val time = todoFormVM.item.startTime
-                Text(time.ifEmpty { "点击输入时间" })
-            }
-            if (todoFormVM.errorMap.containsKey("startTime")) {
-                Text(
-                    text = todoFormVM.errorMap.getValue("startTime"),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(start = 8.dp, top = 2.dp)
-                )
-            }
+                }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -295,37 +290,33 @@ fun TodoFormPage(id: Long? = null) {
                     offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
                 )
             )
-            Row(
+            OutlinedTextField(
+                value = todoFormVM.item.endTime,
+                onValueChange = { },
+                readOnly = true,
+                placeholder = { Text("点击输入结束时间") },
+                trailingIcon = {
+                    IconButton(onClick = { endTimeVisible = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
+                },
                 modifier = Modifier
-                    .padding(top = 8.dp)
+                    .padding(top = 4.dp)
                     .fillMaxWidth()
-                    .height(40.dp)
-                    .border(
-                        width = 1.dp,
-                        color = if (todoFormVM.errorMap.containsKey("endTime")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
-                        shape = RoundedCornerShape(4.dp)
-                    )
                     .onGloballyPositioned { coords ->
                         endTimeAnchorBoundsPx = coords.boundsInWindow()
+                    },
+                supportingText = {
+                    if (todoFormVM.errorMap.containsKey("endTime")) {
+                        Text(text = todoFormVM.errorMap.getValue("endTime"))
                     }
-                    .noRippleClickable { endTimeVisible = true }
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val time = todoFormVM.item.endTime
-                Text(time.ifEmpty { "点击输入时间" })
-            }
-            if (todoFormVM.errorMap.containsKey("endTime")) {
-                Text(
-                    text = todoFormVM.errorMap.getValue("endTime"),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(start = 8.dp, top = 2.dp)
-                )
-            }
+                }
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 描述输入
             Text(
@@ -361,7 +352,7 @@ fun TodoFormPage(id: Long? = null) {
     startTimeAnchorBoundsPx?.let {
         DateTimePickerPopup(
             visible = startTimeVisible,
-            initialDateTime = if (todoFormVM.item.startTime.isNotEmpty()) todoFormVM.item.startTime.toLocalDateTime() else null,
+            selectedDateTime = if (todoFormVM.item.startTime.isNotEmpty()) todoFormVM.item.startTime.toLocalDateTime() else null,
             anchorBoundsPx = it,
             onDismiss = {
                 startTimeVisible = false
@@ -376,7 +367,7 @@ fun TodoFormPage(id: Long? = null) {
     endTimeAnchorBoundsPx?.let {
         DateTimePickerPopup(
             visible = endTimeVisible,
-            initialDateTime = if (todoFormVM.item.endTime.isNotEmpty()) todoFormVM.item.endTime.toLocalDateTime() else null,
+            selectedDateTime = if (todoFormVM.item.endTime.isNotEmpty()) todoFormVM.item.endTime.toLocalDateTime() else null,
             anchorBoundsPx = it,
             onDismiss = {
                 endTimeVisible = false

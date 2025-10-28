@@ -44,6 +44,50 @@ fun LocalDateTime.formatWithPattern(pattern: DateTimePatternEnum = DateTimePatte
     }
 }
 
+fun LocalDateTime.copy(
+    year: Int? = null,
+    month: Int? = null,
+    day: Int? = null,
+    hour: Int? = null,
+    minute: Int? = null,
+    second: Int? = null
+): LocalDateTime {
+    val newYear = year ?: this.year
+    val newMonth = month ?: this.monthNumber
+    val newDay = day ?: this.dayOfMonth
+    val newHour = hour ?: this.hour
+    val newMinute = minute ?: this.minute
+    val newSecond = second ?: this.second
+
+    val maxDays = this.getMaxDaysInMonth(newYear, newMonth)
+    val correctedDay = newDay.coerceAtMost(maxDays)
+
+    return LocalDateTime(
+        year = newYear,
+        monthNumber = newMonth,
+        dayOfMonth = correctedDay,
+        hour = newHour,
+        minute = newMinute,
+        second = newSecond
+    )
+}
+
+/**
+ * 获取某年某月的最大天数
+ */
+fun LocalDateTime.getMaxDaysInMonth(year: Int? = null, month: Int? = null): Int {
+    val targetYear = year ?: this.year
+    val targetMonth = month ?: this.monthNumber
+
+    val isLeapYear = targetYear % 4 == 0 && (targetYear % 100 != 0 || targetYear % 400 == 0)
+
+    return when (targetMonth) {
+        2 -> if (isLeapYear) 29 else 28
+        4, 6, 9, 11 -> 30
+        else -> 31
+    }
+}
+
 fun String.toLocalDateTime(): LocalDateTime {
     val parts = this.split(" ", "-", ":")
     require(parts.size == 6) { "Invalid date format: $this" }

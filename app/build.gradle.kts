@@ -27,8 +27,8 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 33
-        versionName = "1.0.18"
+        versionCode = 34
+        versionName = "1.0.19"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

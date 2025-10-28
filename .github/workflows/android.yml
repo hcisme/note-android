@@ -96,4 +96,5 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 优化显示
+            - 优化代码
+            - 优化布局
