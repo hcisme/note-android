@@ -39,9 +39,9 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
     }
     val exitTransition = remember {
         slideOutVertically(
-            animationSpec = tween(durationMillis = 600, easing = FastOutLinearInEasing),
+            animationSpec = tween(durationMillis = 500, easing = FastOutLinearInEasing),
             targetOffsetY = { it }
-        ) + fadeOut(animationSpec = tween(durationMillis = 320))
+        ) + fadeOut(animationSpec = tween(durationMillis = 400))
     }
 
     NavHost(

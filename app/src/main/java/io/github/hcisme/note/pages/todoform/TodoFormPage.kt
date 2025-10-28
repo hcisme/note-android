@@ -37,12 +37,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,8 +57,9 @@ import io.github.hcisme.note.utils.formatWithPattern
 import io.github.hcisme.note.utils.noRippleClickable
 import io.github.hcisme.note.utils.toLocalDateTime
 import io.github.hcisme.note.utils.withBadge
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,10 +75,38 @@ fun TodoFormPage(id: Long? = null) {
 
     // 操控 ui 相关变量
     var dialogVisible by remember { mutableStateOf(false) }
+    // 开始时间
+    val startCoordsRef = remember { AtomicReference<LayoutCoordinates?>(null) }
     var startTimeVisible by remember { mutableStateOf(false) }
-    var startTimeAnchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
+    var startTimeAnchorOffset by remember { mutableStateOf<IntOffset?>(null) }
+    // 结束时间
+    val endCoordsRef = remember { AtomicReference<LayoutCoordinates?>(null) }
     var endTimeVisible by remember { mutableStateOf(false) }
-    var endTimeAnchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
+    var endTimeAnchorOffset by remember { mutableStateOf<IntOffset?>(null) }
+
+    val openStartTimeDialog: () -> Unit = {
+        startTimeVisible = true
+        val coords = startCoordsRef.get()
+        coords?.let {
+            val offset = IntOffset(
+                x = it.boundsInWindow().left.roundToInt(),
+                y = it.boundsInWindow().bottom.roundToInt()
+            )
+            startTimeAnchorOffset = offset
+        }
+    }
+
+    val openEndTimeDialog: () -> Unit = {
+        endTimeVisible = true
+        val coords = endCoordsRef.get()
+        coords?.let {
+            val offset = IntOffset(
+                x = it.boundsInWindow().left.roundToInt(),
+                y = it.boundsInWindow().bottom.roundToInt()
+            )
+            endTimeAnchorOffset = offset
+        }
+    }
 
     LaunchedEffect(id) {
         if (id != null) {
@@ -105,7 +135,6 @@ fun TodoFormPage(id: Long? = null) {
                                 scope.launch {
                                     focusManager.clearFocus()
                                     keyboardController?.hide()
-                                    delay(300)
                                     navHostController.popBackStack()
                                 }
                             }
@@ -257,7 +286,7 @@ fun TodoFormPage(id: Long? = null) {
                 readOnly = true,
                 placeholder = { Text("点击输入开始时间") },
                 trailingIcon = {
-                    IconButton(onClick = { startTimeVisible = true }) {
+                    IconButton(onClick = openStartTimeDialog) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "Select date"
@@ -267,9 +296,8 @@ fun TodoFormPage(id: Long? = null) {
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .fillMaxWidth()
-                    .onGloballyPositioned { coords ->
-                        startTimeAnchorBoundsPx = coords.boundsInWindow()
-                    },
+                    .onGloballyPositioned { coords -> startCoordsRef.set(coords) },
+                isError = todoFormVM.errorMap.containsKey("startTime"),
                 supportingText = {
                     if (todoFormVM.errorMap.containsKey("startTime")) {
                         Text(text = todoFormVM.errorMap.getValue("startTime"))
@@ -296,7 +324,7 @@ fun TodoFormPage(id: Long? = null) {
                 readOnly = true,
                 placeholder = { Text("点击输入结束时间") },
                 trailingIcon = {
-                    IconButton(onClick = { endTimeVisible = true }) {
+                    IconButton(onClick = openEndTimeDialog) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "Select date"
@@ -306,9 +334,8 @@ fun TodoFormPage(id: Long? = null) {
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .fillMaxWidth()
-                    .onGloballyPositioned { coords ->
-                        endTimeAnchorBoundsPx = coords.boundsInWindow()
-                    },
+                    .onGloballyPositioned { coords -> endCoordsRef.set(coords) },
+                isError = todoFormVM.errorMap.containsKey("endTime"),
                 supportingText = {
                     if (todoFormVM.errorMap.containsKey("endTime")) {
                         Text(text = todoFormVM.errorMap.getValue("endTime"))
@@ -349,35 +376,29 @@ fun TodoFormPage(id: Long? = null) {
         }
     }
 
-    startTimeAnchorBoundsPx?.let {
-        DateTimePickerPopup(
-            visible = startTimeVisible,
-            selectedDateTime = if (todoFormVM.item.startTime.isNotEmpty()) todoFormVM.item.startTime.toLocalDateTime() else null,
-            anchorBoundsPx = it,
-            onDismiss = {
-                startTimeVisible = false
-                startTimeAnchorBoundsPx = null
-            },
-            onDateTimeSelected = { dateTime ->
-                todoFormVM.onValuesChange(todoFormVM.item.copy(startTime = dateTime.formatWithPattern()))
-            }
-        )
-    }
+    DateTimePickerPopup(
+        visible = startTimeVisible,
+        selectedDateTime = if (todoFormVM.item.startTime.isNotEmpty()) todoFormVM.item.startTime.toLocalDateTime() else null,
+        anchorBoundsIntOffset = startTimeAnchorOffset,
+        onDismiss = {
+            startTimeVisible = false
+        },
+        onDateTimeSelected = { dateTime ->
+            todoFormVM.onValuesChange(todoFormVM.item.copy(startTime = dateTime.formatWithPattern()))
+        }
+    )
 
-    endTimeAnchorBoundsPx?.let {
-        DateTimePickerPopup(
-            visible = endTimeVisible,
-            selectedDateTime = if (todoFormVM.item.endTime.isNotEmpty()) todoFormVM.item.endTime.toLocalDateTime() else null,
-            anchorBoundsPx = it,
-            onDismiss = {
-                endTimeVisible = false
-                endTimeAnchorBoundsPx = null
-            },
-            onDateTimeSelected = { dateTime ->
-                todoFormVM.onValuesChange(todoFormVM.item.copy(endTime = dateTime.formatWithPattern()))
-            }
-        )
-    }
+    DateTimePickerPopup(
+        visible = endTimeVisible,
+        selectedDateTime = if (todoFormVM.item.endTime.isNotEmpty()) todoFormVM.item.endTime.toLocalDateTime() else null,
+        anchorBoundsIntOffset = endTimeAnchorOffset,
+        onDismiss = {
+            endTimeVisible = false
+        },
+        onDateTimeSelected = { dateTime ->
+            todoFormVM.onValuesChange(todoFormVM.item.copy(endTime = dateTime.formatWithPattern()))
+        }
+    )
 
     Dialog(
         visible = dialogVisible,
@@ -388,7 +409,6 @@ fun TodoFormPage(id: Long? = null) {
                 dialogVisible = false
                 focusManager.clearFocus()
                 keyboardController?.hide()
-                delay(300)
                 navHostController.popBackStack()
             }
         },

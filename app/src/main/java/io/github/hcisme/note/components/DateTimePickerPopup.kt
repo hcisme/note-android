@@ -1,11 +1,7 @@
 package io.github.hcisme.note.components
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -63,29 +58,22 @@ import kotlin.math.abs
 fun DateTimePickerPopup(
     visible: Boolean,
     selectedDateTime: LocalDateTime? = null,
-    anchorBoundsPx: Rect,
+    anchorBoundsIntOffset: IntOffset? = null,
     onDismiss: () -> Unit,
     onDateTimeSelected: (LocalDateTime) -> Unit = {}
 ) {
     val defaultTime =
         remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()) }
-    val xPx = anchorBoundsPx.left.toInt()
-    val yPx = anchorBoundsPx.bottom.toInt()
 
-    Popup(
-        offset = IntOffset(x = xPx, y = yPx),
-        onDismissRequest = onDismiss,
-        properties = PopupProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-            excludeFromSystemGesture = false
-        )
-    ) {
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = visible,
-            enter = fadeIn(animationSpec = tween(160)),
-            exit = fadeOut(animationSpec = tween(140))
+    if (visible && anchorBoundsIntOffset != null) {
+        Popup(
+            offset = anchorBoundsIntOffset,
+            onDismissRequest = onDismiss,
+            properties = PopupProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                excludeFromSystemGesture = false
+            )
         ) {
             DateTimePicker(
                 selectedDateTime = selectedDateTime ?: defaultTime,
