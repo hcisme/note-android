@@ -32,5 +32,7 @@ class ApkDownloadManager(context: Context) {
         onSuccess(result.getOrNull()!!)
     }
 
-    fun genApkName(code: Int, name: String) = "app_v${name}_${code}.apk"
+    companion object {
+        fun genApkName(code: Int, name: String) = "app_v${name}_${code}.apk"
+    }
 }

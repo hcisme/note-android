@@ -43,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.constants.VersionConstant
+import io.github.hcisme.note.enums.DownloadDialogTextEnum.Download
+import io.github.hcisme.note.enums.DownloadDialogTextEnum.Downloading
+import io.github.hcisme.note.enums.DownloadDialogTextEnum.Install
 import io.github.hcisme.note.navigation.NavigationName
 import io.github.hcisme.note.pages.home.user.UserViewModel
 import io.github.hcisme.note.utils.DownloadProgressManager
@@ -61,7 +64,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
     val navHostController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
     val userVM = viewModel<UserViewModel>()
-    val settingVM = viewModel<SettingViewModel>()
+    val settingVM = viewModel<SettingViewModel>(context as ComponentActivity)
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
 
@@ -69,6 +72,12 @@ fun SettingPage(modifier: Modifier = Modifier) {
         settingVM.getUpdateVersionInfo()
         userVM.userInfo = sharedPreferences.getUserInfo()
         userVM.getUserInfo()
+    }
+
+    LaunchedEffect(showUpdateDialog) {
+        if (showUpdateDialog) {
+            settingVM.updateConfirmText()
+        }
     }
 
     Scaffold(
@@ -214,7 +223,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
 
     Dialog(
         visible = showUpdateDialog,
-        confirmButtonText = if (DownloadProgressManager.downloadProgress != null) "下载中" else "下载",
+        confirmButtonText = settingVM.confirmTextEnum.text,
         cancelButtonText = "取消",
         title = {
             val info = settingVM.updateVersionInfo
@@ -223,9 +232,24 @@ fun SettingPage(modifier: Modifier = Modifier) {
             Text("更新内容 $versionName $versionCode")
         },
         onConfirm = {
-            if (DownloadProgressManager.downloadProgress != null) return@Dialog
-            settingVM.download()
             showUpdateDialog = false
+            when (settingVM.confirmTextEnum) {
+                Download -> {
+                    settingVM.download(onSuccess = { showUpdateDialog = false })
+                }
+
+                Install -> {
+                    val info = settingVM.updateVersionInfo!!
+                    settingVM.installManager.installApk(
+                        settingVM.getTargetFile(
+                            code = info.versionCode!!,
+                            name = info.versionName!!
+                        )
+                    )
+                }
+
+                Downloading -> {}
+            }
         },
         onDismissRequest = { showUpdateDialog = false }
     ) {

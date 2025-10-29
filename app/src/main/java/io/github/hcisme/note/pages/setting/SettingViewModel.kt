@@ -13,11 +13,13 @@ import androidx.lifecycle.viewModelScope
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.constants.Constant
 import io.github.hcisme.note.constants.VersionConstant
+import io.github.hcisme.note.enums.DownloadDialogTextEnum
 import io.github.hcisme.note.network.VersionService
 import io.github.hcisme.note.network.model.VersionModel
 import io.github.hcisme.note.network.safeRequestCall
 import io.github.hcisme.note.utils.ApkDownloadManager
 import io.github.hcisme.note.utils.DownloadProgressManager
+import io.github.hcisme.note.utils.FileUtil
 import io.github.hcisme.note.utils.InstallManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,8 +27,9 @@ import java.io.File
 
 class SettingViewModel(application: Application) : AndroidViewModel(application) {
     private val apkDownloadManager = ApkDownloadManager(application)
-    private val installManager = InstallManager(context = application)
+    val installManager = InstallManager(context = application)
     var updateVersionInfo by mutableStateOf<VersionModel?>(null)
+    var confirmTextEnum by mutableStateOf(DownloadDialogTextEnum.Download)
 
     fun getUpdateVersionInfo() {
         viewModelScope.launch {
@@ -97,6 +100,46 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun updateConfirmText() {
+        val info = updateVersionInfo ?: run {
+            confirmTextEnum = DownloadDialogTextEnum.Download
+            return
+        }
+
+        val code = info.versionCode ?: run {
+            confirmTextEnum = DownloadDialogTextEnum.Download
+            return
+        }
+
+        val name = info.versionName ?: run {
+            confirmTextEnum = DownloadDialogTextEnum.Download
+            return
+        }
+
+        val expectedMd5 = info.fileMd5 ?: run {
+            confirmTextEnum = DownloadDialogTextEnum.Download
+            return
+        }
+
+        val outputFile = getTargetFile(code = code, name = name)
+
+        // 判断逻辑
+        confirmTextEnum = when {
+            // 文件存在且MD5匹配 -> 安装
+            isFileDownloadedAndValid(outputFile, expectedMd5) -> {
+                DownloadDialogTextEnum.Install
+            }
+            // 正在下载中 -> 下载中
+            isDownloadInProgress() -> {
+                DownloadDialogTextEnum.Downloading
+            }
+            // 默认情况 -> 下载
+            else -> {
+                DownloadDialogTextEnum.Download
+            }
+        }
+    }
+
     fun clearCache() {
         viewModelScope.launch(Dispatchers.IO) {
             val downloadDir = File(
@@ -117,4 +160,39 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
             NotificationManager.showNotification("清除完毕")
         }
     }
+
+    /**
+     * 得到目标文件
+     */
+    fun getTargetFile(code: Int, name: String): File {
+        val fileName = ApkDownloadManager.genApkName(code = code, name = name)
+        val downloadDir = File(
+            application.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
+            Constant.INNER_DOWNLOAD_DIR_NAME
+        ).apply { if (!exists()) mkdirs() }
+        return File(downloadDir, fileName)
+    }
+
+    /**
+     * 检查文件是否已下载且有效
+     */
+    private fun isFileDownloadedAndValid(file: File, expectedMd5: String): Boolean {
+        return try {
+            if (!file.exists() || !file.isFile) return false
+
+            // 检查文件大小（可选，防止损坏的文件）
+            if (file.length() == 0L) return false
+
+            // 验证MD5
+            val actualMd5 = FileUtil.calculateMd5(file)
+            actualMd5 == expectedMd5
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /**
+     * 检查是否正在下载
+     */
+    private fun isDownloadInProgress() = DownloadProgressManager.downloadProgress != null
 }
