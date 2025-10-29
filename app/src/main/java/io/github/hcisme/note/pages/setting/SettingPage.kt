@@ -1,6 +1,7 @@
 package io.github.hcisme.note.pages.setting
 
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -45,7 +46,6 @@ import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.navigation.NavigationName
 import io.github.hcisme.note.pages.home.user.UserViewModel
 import io.github.hcisme.note.utils.DownloadProgressManager
-import io.github.hcisme.note.utils.InstallManager
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken
@@ -62,7 +62,6 @@ fun SettingPage(modifier: Modifier = Modifier) {
     val sharedPreferences = LocalSharedPreferences.current
     val userVM = viewModel<UserViewModel>()
     val settingVM = viewModel<SettingViewModel>()
-    val installManager = remember { InstallManager(context = context) }
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
 
@@ -215,7 +214,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
 
     Dialog(
         visible = showUpdateDialog,
-        confirmButtonText = "下载",
+        confirmButtonText = if (DownloadProgressManager.downloadProgress != null) "下载中" else "下载",
         cancelButtonText = "取消",
         title = {
             val info = settingVM.updateVersionInfo
@@ -224,16 +223,8 @@ fun SettingPage(modifier: Modifier = Modifier) {
             Text("更新内容 $versionName $versionCode")
         },
         onConfirm = {
-            settingVM.download(
-                onSuccess = { file ->
-                    DownloadProgressManager.resetProgress()
-                    installManager.installApk(apkFile = file)
-                },
-                onError = {
-                    DownloadProgressManager.resetProgress()
-                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                }
-            )
+            if (DownloadProgressManager.downloadProgress != null) return@Dialog
+            settingVM.download()
             showUpdateDialog = false
         },
         onDismissRequest = { showUpdateDialog = false }

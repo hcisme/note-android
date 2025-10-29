@@ -72,7 +72,6 @@ class DownloadManager(private val context: Context) {
                         while (bytesRead >= 0) {
                             outputStream.write(buffer, 0, bytesRead)
                             totalBytesRead += bytesRead
-
                             // 更新进度
                             if (contentLength > 0) {
                                 val progress =

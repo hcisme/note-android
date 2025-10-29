@@ -18,12 +18,14 @@ import io.github.hcisme.note.network.model.VersionModel
 import io.github.hcisme.note.network.safeRequestCall
 import io.github.hcisme.note.utils.ApkDownloadManager
 import io.github.hcisme.note.utils.DownloadProgressManager
+import io.github.hcisme.note.utils.InstallManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
 class SettingViewModel(application: Application) : AndroidViewModel(application) {
     private val apkDownloadManager = ApkDownloadManager(application)
+    private val installManager = InstallManager(context = application)
     var updateVersionInfo by mutableStateOf<VersionModel?>(null)
 
     fun getUpdateVersionInfo() {
@@ -77,9 +79,13 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                 },
                 onSuccess = {
                     Toast.makeText(application, "下载完成", Toast.LENGTH_SHORT).show()
+                    DownloadProgressManager.resetProgress()
+                    installManager.installApk(apkFile = it)
                     onSuccess(it)
                 },
                 onError = { throwable ->
+                    DownloadProgressManager.resetProgress()
+                    Toast.makeText(application, throwable.message, Toast.LENGTH_LONG).show()
                     onError(throwable.message ?: "")
                     Log.e(
                         "${Constant.APP_LOG_TAG} APK下载异常",

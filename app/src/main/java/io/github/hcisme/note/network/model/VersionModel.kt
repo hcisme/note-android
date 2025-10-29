@@ -11,6 +11,7 @@ data class VersionModel(
     var fileSize: Long? = null,
     var fileMd5: String? = null,
     var updateContent: String? = null,
+    var published: Int? = null,
     var publishTime: String? = null,
     var createdTime: String? = null,
     var updatedTime: String? = null

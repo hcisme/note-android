@@ -87,7 +87,6 @@ object Request {
                             contentType.subtype.contains("image") ||
                             response.request.url.toString().contains("/download/") // 特定下载端点
                     )
-
             if (isStream) {
                 val progressBody = ProgressResponseBody(
                     url = response.request.url.toString(),
