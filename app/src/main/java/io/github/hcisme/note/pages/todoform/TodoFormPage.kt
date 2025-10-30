@@ -118,6 +118,7 @@ fun TodoFormPage(id: Long? = null) {
 
         if (todoFormVM.haveChangedForm && !dialogVisible) {
             dialogVisible = true
+            return
         }
 
         navHostController.popBackStack()

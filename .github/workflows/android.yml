@@ -96,5 +96,4 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 优化布局 优化性能
-            - 优化返回逻辑
+            - 修复bug
