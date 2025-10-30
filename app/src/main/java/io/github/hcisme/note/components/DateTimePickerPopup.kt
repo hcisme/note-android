@@ -2,6 +2,8 @@ package io.github.hcisme.note.components
 
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +16,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,11 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -47,6 +49,7 @@ import io.github.hcisme.note.utils.copy
 import io.github.hcisme.note.utils.formatWithPattern
 import io.github.hcisme.note.utils.getMaxDaysInMonth
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -59,16 +62,40 @@ fun DateTimePickerPopup(
     visible: Boolean,
     selectedDateTime: LocalDateTime? = null,
     anchorBoundsIntOffset: IntOffset? = null,
+    animateDt: Int = 300,
     onDismiss: () -> Unit,
     onDateTimeSelected: (LocalDateTime) -> Unit = {}
 ) {
-    val defaultTime =
-        remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()) }
+    val scope = rememberCoroutineScope()
+    val defaultTime = remember {
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    }
+    // 动画状态
+    var innerIsVisible by remember { mutableStateOf(false) }
+    val alpha by animateFloatAsState(
+        targetValue = if (innerIsVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = animateDt),
+        label = "DateTimePickerPopup_alpha"
+    )
+
+    val hide: () -> Unit = {
+        scope.launch {
+            innerIsVisible = false
+            delay(animateDt.toLong())
+            onDismiss()
+        }
+    }
+
+    LaunchedEffect(visible) {
+        if (visible) {
+            innerIsVisible = true
+        }
+    }
 
     if (visible && anchorBoundsIntOffset != null) {
         Popup(
             offset = anchorBoundsIntOffset,
-            onDismissRequest = onDismiss,
+            onDismissRequest = hide,
             properties = PopupProperties(
                 dismissOnBackPress = true,
                 dismissOnClickOutside = true,
@@ -76,12 +103,19 @@ fun DateTimePickerPopup(
             )
         ) {
             DateTimePicker(
+                modifier = Modifier.graphicsLayer { this.alpha = alpha },
                 selectedDateTime = selectedDateTime ?: defaultTime,
                 onDateTimeChanged = onDateTimeSelected
             )
         }
     }
 }
+
+// 日期常量
+private val months = (1..12).map { it.toString().padStart(2, '0') }
+private val hours = (0..23).map { it.toString().padStart(2, '0') }
+private val minutes = (0..59).map { it.toString().padStart(2, '0') }
+private val seconds = (0..59).map { it.toString().padStart(2, '0') }
 
 @Composable
 fun DateTimePicker(
@@ -98,11 +132,7 @@ fun DateTimePicker(
         selectedDateTime.getMaxDaysInMonth()
     }
     val years = remember(minYear, maxYear) { (minYear..maxYear).map { it.toString() } }
-    val months = remember { (1..12).map { it.toString().padStart(2, '0') } }
     val days = remember(daysInMonth) { (1..daysInMonth).map { it.toString().padStart(2, '0') } }
-    val hours = remember { (0..23).map { it.toString().padStart(2, '0') } }
-    val minutes = remember { (0..59).map { it.toString().padStart(2, '0') } }
-    val seconds = remember { (0..59).map { it.toString().padStart(2, '0') } }
 
     fun update(newDateTime: LocalDateTime) {
         onDateTimeChanged(newDateTime)
@@ -111,12 +141,12 @@ fun DateTimePicker(
 
     Row(
         modifier = modifier
+            .padding(8.dp)
             .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .background(MaterialTheme.colorScheme.background),
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                shape = MaterialTheme.shapes.medium
+            ),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

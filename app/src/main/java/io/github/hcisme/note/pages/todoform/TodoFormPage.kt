@@ -108,6 +108,21 @@ fun TodoFormPage(id: Long? = null) {
         }
     }
 
+    fun backHandler() {
+        if (startTimeVisible || endTimeVisible || keyboardHeight != 0.dp) {
+            startTimeVisible = false
+            endTimeVisible = false
+            keyboardController?.hide()
+            return
+        }
+
+        if (todoFormVM.haveChangedForm && !dialogVisible) {
+            dialogVisible = true
+        }
+
+        navHostController.popBackStack()
+    }
+
     LaunchedEffect(id) {
         if (id != null) {
             todoFormVM.item = todoFormVM.item.copy(id = id)
@@ -127,19 +142,7 @@ fun TodoFormPage(id: Long? = null) {
             TopAppBar(
                 title = { Text(text = if (isEdit) "编辑事项" else "新增事项") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            if (todoFormVM.haveChangedForm) {
-                                dialogVisible = true
-                            } else {
-                                scope.launch {
-                                    focusManager.clearFocus()
-                                    keyboardController?.hide()
-                                    navHostController.popBackStack()
-                                }
-                            }
-                        }
-                    ) {
+                    IconButton(onClick = { backHandler() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = Icons.AutoMirrored.Filled.ArrowBack.name
@@ -181,10 +184,7 @@ fun TodoFormPage(id: Long? = null) {
                 .padding(bottom = keyboardHeight)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .noRippleClickable {
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                }
+                .noRippleClickable { keyboardController?.hide() }
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .verticalScroll(verticalScrollState),
@@ -417,18 +417,7 @@ fun TodoFormPage(id: Long? = null) {
         Text("编辑的内容未保存\n确认离开吗")
     }
 
-    BackHandler(
-        enabled = todoFormVM.haveChangedForm
-                || startTimeVisible
-                || endTimeVisible
-    ) {
-        if (!dialogVisible) {
-            dialogVisible = true
-        }
-
-        if (startTimeVisible || endTimeVisible) {
-            startTimeVisible = false
-            endTimeVisible = false
-        }
+    BackHandler {
+        backHandler()
     }
 }

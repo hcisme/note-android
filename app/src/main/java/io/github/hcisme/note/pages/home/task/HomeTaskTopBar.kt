@@ -1,7 +1,5 @@
 package io.github.hcisme.note.pages.home.task
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,18 +18,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
 import io.github.hcisme.note.navigation.navigateToTodoForm
 import io.github.hcisme.note.utils.DateUtil.months
 import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.noRippleClickable
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,8 +41,10 @@ fun HomeTaskTopBar() {
     val navHostController = LocalNavController.current
     val taskVM = viewModel<TaskViewModel>()
     val currentDate = taskVM.currentDate
-    var anchorBoundsPx by remember { mutableStateOf<Rect?>(null) }
-    var showPopup by remember { mutableStateOf(false) }
+    // 日期选择框相关
+    val datePickerCoordsRef = remember { AtomicReference<LayoutCoordinates?>(null) }
+    var datePickerAnchorOffset by remember { mutableStateOf<IntOffset?>(null) }
+    var showDatePickerPopup by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -54,17 +58,23 @@ fun HomeTaskTopBar() {
         }
     }
 
+    val openDatePickerDialog: () -> Unit = {
+        val coords = datePickerCoordsRef.get()
+        coords?.let {
+            datePickerAnchorOffset = IntOffset(
+                x = it.boundsInWindow().left.roundToInt(),
+                y = it.boundsInWindow().bottom.roundToInt()
+            )
+            showDatePickerPopup = true
+        }
+    }
+
     TopAppBar(
         title = {
             Column(
                 modifier = Modifier
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) { showPopup = true }
-                    .onGloballyPositioned { coords ->
-                        anchorBoundsPx = coords.boundsInWindow()
-                    }
+                    .noRippleClickable(onClick = openDatePickerDialog)
+                    .onGloballyPositioned { datePickerCoordsRef.set(it) }
             ) {
                 Text(
                     text = "${months[currentDate.monthNumber - 1]} ${currentDate.year}",
@@ -99,29 +109,26 @@ fun HomeTaskTopBar() {
         }
     )
 
-    anchorBoundsPx?.let {
-        DatePickerPopup(
-            visible = showPopup,
-            anchorBoundsPx = it,
-            initialYear = currentDate.year,
-            initialMonth = currentDate.monthNumber,
-            onSelect = { year, month, day ->
-                if (year == currentDate.year && month == currentDate.monthNumber) return@DatePickerPopup
-                taskVM.changeDate(
-                    index = day - 1,
-                    date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
-                )
-            },
-            onClickToday = { year, month, day ->
-                taskVM.changeDate(
-                    index = day - 1,
-                    date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
-                )
-            },
-            onDismiss = {
-                showPopup = false
-                anchorBoundsPx = null
-            }
-        )
-    }
+    DatePickerPopup(
+        visible = showDatePickerPopup,
+        anchorBoundsOffset = datePickerAnchorOffset,
+        initialYear = currentDate.year,
+        initialMonth = currentDate.monthNumber,
+        onSelect = { year, month, day ->
+            if (year == currentDate.year && month == currentDate.monthNumber) return@DatePickerPopup
+            taskVM.changeDate(
+                index = day - 1,
+                date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
+            )
+        },
+        onClickToday = { year, month, day ->
+            taskVM.changeDate(
+                index = day - 1,
+                date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
+            )
+        },
+        onDismiss = {
+            showDatePickerPopup = false
+        }
+    )
 }

@@ -1,9 +1,7 @@
 package io.github.hcisme.note.components
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,15 +25,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import io.github.hcisme.note.utils.DateUtil
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -44,46 +45,58 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun DatePickerPopup(
     visible: Boolean,
-    anchorBoundsPx: Rect,
+    anchorBoundsOffset: IntOffset? = null,
     initialYear: Int,
     initialMonth: Int,
     spanEachSide: Int = 5,
+    animateDt: Int = 160,
     onSelect: (year: Int, month: Int, day: Int) -> Unit,
     onClickToday: (year: Int, month: Int, day: Int) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     val yearListState = rememberLazyListState()
     val monthListState = rememberLazyListState()
     var selectedYear by remember { mutableIntStateOf(initialYear) }
     var selectedMonth by remember { mutableIntStateOf(initialMonth) }
     val years by remember { derivedStateOf { DateUtil.yearsAround(selectedYear, spanEachSide) } }
     val months = remember { (1..12).toList() }
-    // Popup 的目标偏移（基于 anchor 的左下角）
-    val xPx = anchorBoundsPx.left.toInt()
-    val yPx = anchorBoundsPx.bottom.toInt()
+
+    // 动画状态
+    var innerIsVisible by remember { mutableStateOf(false) }
+    val alpha by animateFloatAsState(
+        targetValue = if (innerIsVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = animateDt),
+        label = "DatePickerPopup_alpha"
+    )
+
+    val hide: () -> Unit = {
+        scope.launch {
+            innerIsVisible = false
+            delay(animateDt.toLong())
+            onDismiss()
+        }
+    }
 
     LaunchedEffect(visible) {
-        if (visible) {
+        if (visible && anchorBoundsOffset != null) {
             val yearIndex = years.indexOfFirst { it == selectedYear }.let { if (it >= 0) it else 0 }
             val monthIndex =
                 months.indexOfFirst { it == selectedMonth }.let { if (it >= 0) it else 0 }
             yearListState.scrollToItem(yearIndex)
             monthListState.scrollToItem(monthIndex)
+            innerIsVisible = true
         }
     }
 
-    Popup(onDismissRequest = onDismiss, offset = IntOffset(x = xPx, y = yPx)) {
-        AnimatedVisibility(
-            visible = visible,
-            enter = fadeIn(animationSpec = tween(160)),
-            exit = fadeOut(animationSpec = tween(140))
-        ) {
+    if (visible && anchorBoundsOffset != null) {
+        Popup(onDismissRequest = hide, offset = anchorBoundsOffset) {
             Card(
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(8.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                shape = RoundedCornerShape(12.dp)
+                    .padding(8.dp)
+                    .graphicsLayer { this.alpha = alpha },
+                shape = MaterialTheme.shapes.medium
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(
@@ -167,15 +180,16 @@ fun DatePickerPopup(
                     ) {
                         TextButton(
                             onClick = {
-                                val today =
-                                    Clock.System.now()
-                                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                val today = Clock.System.now()
+                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                selectedYear = today.year
+                                selectedMonth = today.monthNumber
                                 onClickToday(
                                     today.year,
                                     today.monthNumber,
                                     today.dayOfMonth
                                 )
-                                onDismiss()
+                                hide()
                             },
                             shape = MaterialTheme.shapes.small
                         ) {
@@ -185,14 +199,12 @@ fun DatePickerPopup(
                         TextButton(
                             onClick = {
                                 onSelect(selectedYear, selectedMonth, 1)
-                                onDismiss()
+                                hide()
                             },
                             shape = MaterialTheme.shapes.small
                         ) {
                             Text("确定")
                         }
-
-
                     }
                 }
             }
