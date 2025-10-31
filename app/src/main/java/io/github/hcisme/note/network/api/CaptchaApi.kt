@@ -1,6 +1,6 @@
 package io.github.hcisme.note.network.api
 
-import io.github.hcisme.note.network.BaseResult
+import io.github.hcisme.note.network.model.BaseResult
 import io.github.hcisme.note.network.model.CaptchaModel
 import retrofit2.http.GET
 

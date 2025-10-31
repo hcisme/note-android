@@ -96,7 +96,10 @@ fun TaskPage(modifier: Modifier = Modifier) {
                     var currentSelectTodoId by remember { mutableStateOf<Long?>(null) }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        itemsIndexed(taskVM.todoList) { index, it ->
+                        itemsIndexed(
+                            items = taskVM.todoList,
+                            key = { _, item -> item.id }
+                        ) { index, it ->
                             TimelineTaskItem(
                                 modifier = Modifier.padding(horizontal = 8.dp),
                                 item = it,

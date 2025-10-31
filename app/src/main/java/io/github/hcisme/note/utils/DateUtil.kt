@@ -24,6 +24,15 @@ object DateUtil {
     fun yearsAround(year: Int, spanEachSide: Int = 5): List<Int> {
         return (year - spanEachSide..year + spanEachSide).toList()
     }
+
+    fun getMaxDaysInMonth(year: Int, month: Int): Int {
+        val isLeapYear = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+        return when (month) {
+            2 -> if (isLeapYear) 29 else 28
+            4, 6, 9, 11 -> 30
+            else -> 31
+        }
+    }
 }
 
 fun LocalDateTime.formatWithPattern(pattern: DateTimePatternEnum = DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS): String {

@@ -1,6 +1,6 @@
 package io.github.hcisme.note.network.api
 
-import io.github.hcisme.note.network.BaseResult
+import io.github.hcisme.note.network.model.BaseResult
 import io.github.hcisme.note.network.model.VersionModel
 import okhttp3.ResponseBody
 import retrofit2.Response

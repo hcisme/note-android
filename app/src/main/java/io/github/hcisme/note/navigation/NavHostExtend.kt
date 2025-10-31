@@ -3,7 +3,7 @@ package io.github.hcisme.note.navigation
 import androidx.navigation.NavHostController
 
 /**
- * 导航到 编辑 TodoItem 界面
+ * 导航到 编辑 TodoItemFormData 界面
  */
 fun NavHostController.navigateToTodoForm(id: Long? = null) {
     val route = if (id != null) {
@@ -15,7 +15,7 @@ fun NavHostController.navigateToTodoForm(id: Long? = null) {
 }
 
 /**
- * 导航到 编辑 TodoItem 界面
+ * 导航到 编辑 TodoItemFormData 界面
  */
 fun NavHostController.navigateToHomeAndClearStack() {
     navigate(NavigationName.HOME_PAGE) {
@@ -26,14 +26,14 @@ fun NavHostController.navigateToHomeAndClearStack() {
 }
 
 /**
- * 导航到 编辑 TodoItem 界面
+ * 导航到 编辑 TodoItemFormData 界面
  */
 fun NavHostController.navigateToHome() {
     navigate(NavigationName.HOME_PAGE)
 }
 
 /**
- * 导航到 编辑 TodoItem 界面
+ * 导航到 编辑 TodoItemFormData 界面
  */
 fun NavHostController.navigateToSetting() {
     navigate(NavigationName.SETTING_PAGE)

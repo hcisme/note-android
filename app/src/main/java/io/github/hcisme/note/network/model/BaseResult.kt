@@ -1,4 +1,4 @@
-package io.github.hcisme.note.network
+package io.github.hcisme.note.network.model
 
 /**
  * 网络请求第一层返回的结果

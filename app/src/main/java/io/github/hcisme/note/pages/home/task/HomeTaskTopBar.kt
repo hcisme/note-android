@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.DatePickerPopup
 import io.github.hcisme.note.navigation.navigateToTodoForm
+import io.github.hcisme.note.utils.DateUtil
 import io.github.hcisme.note.utils.DateUtil.months
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.noRippleClickable
@@ -48,10 +49,14 @@ fun HomeTaskTopBar() {
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(5_000)
+            delay(9_000)
             if (taskVM.isToday && taskVM.today != taskVM.currentDate) {
+                val days = DateUtil.getMaxDaysInMonth(
+                    year = taskVM.currentDate.year,
+                    month = taskVM.currentDate.monthNumber
+                )
                 taskVM.changeDate(
-                    index = taskVM.selectedTabIndex + 1,
+                    index = if (days == taskVM.selectedTabIndex + 1) 0 else taskVM.selectedTabIndex + 1,
                     date = taskVM.today
                 )
             }

@@ -57,8 +57,8 @@ fun DatePickerPopup(
     val scope = rememberCoroutineScope()
     val yearListState = rememberLazyListState()
     val monthListState = rememberLazyListState()
-    var selectedYear by remember { mutableIntStateOf(initialYear) }
-    var selectedMonth by remember { mutableIntStateOf(initialMonth) }
+    var selectedYear by remember(visible) { mutableIntStateOf(initialYear) }
+    var selectedMonth by remember(visible) { mutableIntStateOf(initialMonth) }
     val years by remember { derivedStateOf { DateUtil.yearsAround(selectedYear, spanEachSide) } }
     val months = remember { (1..12).toList() }
 

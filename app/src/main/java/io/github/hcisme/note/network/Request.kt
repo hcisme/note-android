@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.constants.Constant
 import io.github.hcisme.note.enums.ResponseCodeEnum
+import io.github.hcisme.note.network.model.BaseResult
 import io.github.hcisme.note.pages.AuthManager
 import io.github.hcisme.note.utils.DownloadProgressManager
 import kotlinx.coroutines.Dispatchers

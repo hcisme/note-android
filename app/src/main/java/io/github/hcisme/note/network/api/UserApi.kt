@@ -1,8 +1,8 @@
 package io.github.hcisme.note.network.api
 
-import io.github.hcisme.note.network.BaseResult
+import io.github.hcisme.note.network.model.BaseResult
+import io.github.hcisme.note.network.model.LoginFormData
 import io.github.hcisme.note.network.model.UserInfoModel
-import io.github.hcisme.note.pages.login.LoginFormData
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

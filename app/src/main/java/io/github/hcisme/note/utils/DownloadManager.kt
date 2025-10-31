@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.google.gson.Gson
 import io.github.hcisme.note.constants.Constant
-import io.github.hcisme.note.network.BaseResult
+import io.github.hcisme.note.network.model.BaseResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType

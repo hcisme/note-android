@@ -96,5 +96,5 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 调整结束时间非必传
-            - 优化表单验证
+            - 修复bug
+            - 优化布局

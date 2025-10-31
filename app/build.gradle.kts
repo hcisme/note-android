@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.baselineprofile)
 }
 
 val localProperties = Properties().apply {
@@ -27,20 +28,21 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 41
-        versionName = "1.0.26"
+        versionCode = 42
+        versionName = "1.0.27"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
-            val storePath = System.getenv("RELEASE_STORE_FILE") ?: "debug.keystore"
-
-            storeFile = file(storePath)
-            storePassword = System.getenv("RELEASE_STORE_PASSWORD") ?: ""
-            keyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: ""
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+            val storePath = System.getenv("RELEASE_STORE_FILE") ?: ""
+            if (storePath.isNotEmpty()) {
+                storeFile = file(storePath)
+                storePassword = System.getenv("RELEASE_STORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+            }
         }
     }
 
@@ -51,14 +53,17 @@ android {
 
         release {
             buildConfigField("String", "BASE_URL", releaseBaseUrl)
-            // 应用release签名配置
-            signingConfig = signingConfigs.getByName("release")
+            // 只有在签名配置有效时才应用
+            if (signingConfigs.getByName("release").storeFile?.exists() == true) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             isDebuggable = false
+            isProfileable = true
         }
     }
     compileOptions {
@@ -91,12 +96,14 @@ dependencies {
     implementation(libs.kotlinx.datetime.jvm)
     implementation(libs.gson)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.profileinstaller)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    "baselineProfile"(project(":baselineprofile"))
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

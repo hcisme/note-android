@@ -1,5 +1,6 @@
 package io.github.hcisme.note.pages.home.task
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,12 +33,15 @@ fun HorizontalDateBar() {
         selectedTabIndex = taskVM.selectedTabIndex,
         edgePadding = 0.dp,
         indicator = { tabPositions ->
-            TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[taskVM.selectedTabIndex]),
-                color = MaterialTheme.colorScheme.primary
-            )
+            if (tabPositions.size > taskVM.selectedTabIndex) {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[taskVM.selectedTabIndex]),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     ) {
+        Log.i("@@", taskVM.selectedTabIndex.toString())
         monthDates.forEachIndexed { index, date ->
             Tab(
                 selected = index == taskVM.selectedTabIndex,
