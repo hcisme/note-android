@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.hcisme.note.BuildConfig
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.enums.DownloadDialogTextEnum.Download
@@ -116,7 +117,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
                 },
                 headlineContent = {
                     Text(
-                        text = "检查版本",
+                        text = "检查版本(${BuildConfig.BUILD_TYPE})",
                         modifier = Modifier
                             .withBadge(
                                 showBadge = settingVM.updateVersionInfo != null,

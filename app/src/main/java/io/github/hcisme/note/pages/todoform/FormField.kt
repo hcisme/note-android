@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +25,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.hcisme.note.components.DateTimePickerPopup
+import io.github.hcisme.note.components.time.DateTimePickerPopup
+import io.github.hcisme.note.components.time.rememberTimePickerState
 import io.github.hcisme.note.utils.formatWithPattern
 import io.github.hcisme.note.utils.noRippleClickable
 import io.github.hcisme.note.utils.toLocalDateTime
@@ -206,11 +208,25 @@ fun EndTimePickerField() {
             readOnly = true,
             placeholder = { Text("点击输入结束时间") },
             trailingIcon = {
-                IconButton(onClick = { timePickerState.open() }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Select date"
-                    )
+                Row {
+                    if (todoFormVM.item.endTime != null) {
+                        IconButton(
+                            onClick = {
+                                todoFormVM.item = todoFormVM.item.copy(endTime = null)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "清除结束日期"
+                            )
+                        }
+                    }
+                    IconButton(onClick = { timePickerState.open() }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "选择结束日期"
+                        )
+                    }
                 }
             },
             modifier = Modifier

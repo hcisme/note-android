@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.hcisme.note.BuildConfig
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.RotationIcon
 import io.github.hcisme.note.constants.VersionConstant
@@ -88,6 +89,11 @@ fun LoginPage() {
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
         ) {
+            Text(
+                text = BuildConfig.BUILD_TYPE,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+            )
             Text(
                 text = "version: v${VersionConstant.NAME}",
                 style = MaterialTheme.typography.labelLarge,

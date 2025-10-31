@@ -13,28 +13,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.hcisme.note.components.DatePickerPopup
+import io.github.hcisme.note.components.time.DatePickerPopup
 import io.github.hcisme.note.navigation.navigateToTodoForm
+import io.github.hcisme.note.components.time.rememberTimePickerState
 import io.github.hcisme.note.utils.DateUtil
 import io.github.hcisme.note.utils.DateUtil.months
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.noRippleClickable
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
-import java.util.concurrent.atomic.AtomicReference
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,10 +34,7 @@ fun HomeTaskTopBar() {
     val navHostController = LocalNavController.current
     val taskVM = viewModel<TaskViewModel>()
     val currentDate = taskVM.currentDate
-    // 日期选择框相关
-    val datePickerCoordsRef = remember { AtomicReference<LayoutCoordinates?>(null) }
-    var datePickerAnchorOffset by remember { mutableStateOf<IntOffset?>(null) }
-    var showDatePickerPopup by remember { mutableStateOf(false) }
+    val datePickerState = rememberTimePickerState()
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -63,23 +52,13 @@ fun HomeTaskTopBar() {
         }
     }
 
-    val openDatePickerDialog: () -> Unit = {
-        val coords = datePickerCoordsRef.get()
-        coords?.let {
-            datePickerAnchorOffset = IntOffset(
-                x = it.boundsInWindow().left.roundToInt(),
-                y = it.boundsInWindow().bottom.roundToInt()
-            )
-            showDatePickerPopup = true
-        }
-    }
 
     TopAppBar(
         title = {
             Column(
                 modifier = Modifier
-                    .noRippleClickable(onClick = openDatePickerDialog)
-                    .onGloballyPositioned { datePickerCoordsRef.set(it) }
+                    .noRippleClickable { datePickerState.open() }
+                    .onGloballyPositioned { datePickerState.coordsRef.set(it) }
             ) {
                 Text(
                     text = "${months[currentDate.monthNumber - 1]} ${currentDate.year}",
@@ -115,8 +94,8 @@ fun HomeTaskTopBar() {
     )
 
     DatePickerPopup(
-        visible = showDatePickerPopup,
-        anchorBoundsOffset = datePickerAnchorOffset,
+        visible = datePickerState.visible,
+        anchorBoundsOffset = datePickerState.anchorOffset,
         initialYear = currentDate.year,
         initialMonth = currentDate.monthNumber,
         onSelect = { year, month, day ->
@@ -132,8 +111,6 @@ fun HomeTaskTopBar() {
                 date = LocalDate(year = year, monthNumber = month, dayOfMonth = day)
             )
         },
-        onDismiss = {
-            showDatePickerPopup = false
-        }
+        onDismiss = { datePickerState.close() }
     )
 }

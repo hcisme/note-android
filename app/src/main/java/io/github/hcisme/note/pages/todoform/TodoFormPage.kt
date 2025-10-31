@@ -106,7 +106,7 @@ fun TodoFormPage(id: Long? = null) {
             // 结束时间选择
             EndTimePickerField()
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 描述输入
             DescriptionField()

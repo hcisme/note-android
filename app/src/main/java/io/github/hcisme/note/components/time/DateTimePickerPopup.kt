@@ -1,4 +1,4 @@
-package io.github.hcisme.note.components
+package io.github.hcisme.note.components.time
 
 import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi

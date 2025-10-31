@@ -1,4 +1,4 @@
-package io.github.hcisme.note.components
+package io.github.hcisme.note.components.time
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

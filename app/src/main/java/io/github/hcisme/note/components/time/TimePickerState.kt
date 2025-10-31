@@ -1,4 +1,4 @@
-package io.github.hcisme.note.pages.todoform
+package io.github.hcisme.note.components.time
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

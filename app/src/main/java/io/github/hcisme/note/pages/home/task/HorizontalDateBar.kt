@@ -1,6 +1,5 @@
 package io.github.hcisme.note.pages.home.task
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +40,6 @@ fun HorizontalDateBar() {
             }
         }
     ) {
-        Log.i("@@", taskVM.selectedTabIndex.toString())
         monthDates.forEachIndexed { index, date ->
             Tab(
                 selected = index == taskVM.selectedTabIndex,
