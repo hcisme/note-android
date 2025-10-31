@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -185,6 +187,7 @@ fun TodoFormPage(id: Long? = null) {
                 .padding(bottom = keyboardHeight)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .then(if (keyboardHeight == 0.dp) Modifier.navigationBarsPadding() else Modifier)
                 .noRippleClickable { keyboardController?.hide() }
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -210,6 +213,7 @@ fun TodoFormPage(id: Long? = null) {
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .fillMaxWidth(),
+                singleLine = true,
                 isError = todoFormVM.errorMap.containsKey("title"),
                 supportingText = {
                     if (todoFormVM.errorMap.containsKey("title")) {
@@ -312,15 +316,10 @@ fun TodoFormPage(id: Long? = null) {
             Text(
                 text = "结束时间",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.withBadge(
-                    badgeText = "*",
-                    textColor = MaterialTheme.colorScheme.error,
-                    offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
-                )
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             OutlinedTextField(
-                value = todoFormVM.item.endTime,
+                value = todoFormVM.item.endTime ?: "",
                 onValueChange = { },
                 readOnly = true,
                 placeholder = { Text("点击输入结束时间") },
@@ -335,13 +334,7 @@ fun TodoFormPage(id: Long? = null) {
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .fillMaxWidth()
-                    .onGloballyPositioned { coords -> endCoordsRef.set(coords) },
-                isError = todoFormVM.errorMap.containsKey("endTime"),
-                supportingText = {
-                    if (todoFormVM.errorMap.containsKey("endTime")) {
-                        Text(text = todoFormVM.errorMap.getValue("endTime"))
-                    }
-                }
+                    .onGloballyPositioned { coords -> endCoordsRef.set(coords) }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -365,7 +358,7 @@ fun TodoFormPage(id: Long? = null) {
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .fillMaxWidth()
-                    .height(160.dp),
+                    .heightIn(min = 160.dp),
                 placeholder = { Text("请输入描述内容") },
                 isError = todoFormVM.errorMap.containsKey("content"),
                 supportingText = {
@@ -391,7 +384,7 @@ fun TodoFormPage(id: Long? = null) {
 
     DateTimePickerPopup(
         visible = endTimeVisible,
-        selectedDateTime = if (todoFormVM.item.endTime.isNotEmpty()) todoFormVM.item.endTime.toLocalDateTime() else null,
+        selectedDateTime = todoFormVM.item.endTime?.toLocalDateTime(),
         anchorBoundsIntOffset = endTimeAnchorOffset,
         onDismiss = {
             endTimeVisible = false

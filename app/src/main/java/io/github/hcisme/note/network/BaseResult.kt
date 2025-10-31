@@ -9,3 +9,10 @@ data class BaseResult<out T>(
     val info: String,
     val data: T
 )
+
+data class ValidationErrorResponse(
+    val status: String,
+    val code: Int,
+    val info: String,
+    val data: Map<String, String>? = null
+)

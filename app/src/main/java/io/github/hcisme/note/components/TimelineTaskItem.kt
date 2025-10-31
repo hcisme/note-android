@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
@@ -66,11 +64,13 @@ fun TimelineTaskItem(
                 text = item.startTime.substring(11, 16),
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(
-                text = item.endTime.substring(11, 16),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-            )
+            item.endTime?.let {
+                Text(
+                    text = it.substring(11, 16),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+                )
+            }
         }
 
         Box(
@@ -154,11 +154,13 @@ fun TimelineTaskItem(
                         style = MaterialTheme.typography.labelMedium,
                         color = LocalContentColor.current.copy(alpha = 0.6f)
                     )
-                    Text(
-                        text = "结束时间：${item.endTime}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = LocalContentColor.current.copy(alpha = 0.6f)
-                    )
+                    item.endTime?.let {
+                        Text(
+                            text = "结束时间：${it}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = LocalContentColor.current.copy(alpha = 0.6f)
+                        )
+                    }
                     Text(
                         text = "是否完成：${CompletionStatusEnum.getByStatus(item.completed)!!.desc}",
                         style = MaterialTheme.typography.labelMedium,

@@ -141,7 +141,7 @@ suspend fun <T> safeRequestCall(
     onFinally: () -> Unit = {},
     onSuccess: (result: BaseResult<T>) -> Unit = {}
 ) {
-    return try {
+    try {
         val result = withContext(Dispatchers.IO) { call() }
         if (result.code == ResponseCodeEnum.CODE_200.code) {
             onSuccess(result)

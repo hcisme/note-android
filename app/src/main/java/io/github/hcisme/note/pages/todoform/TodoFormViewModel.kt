@@ -86,7 +86,7 @@ data class TodoItem(
     var content: String = "",
     var completed: Int = 0,
     var startTime: String = "",
-    var endTime: String = ""
+    var endTime: String? = null
 ) {
     fun validate(): Map<String, String> {
         val errors = mutableMapOf<String, String>()
@@ -105,9 +105,9 @@ data class TodoItem(
             errors["startTime"] = "开始时间不能为空"
         }
 
-        if (endTime.isEmpty()) {
-            errors["endTime"] = "结束时间不能为空"
-        }
+//        if (endTime.isEmpty()) {
+//            errors["endTime"] = "结束时间不能为空"
+//        }
 
         return errors
     }

@@ -7,7 +7,7 @@ data class TodoItemModel(
     var content: String,
     var completed: Int,
     var startTime: String,
-    var endTime: String,
+    var endTime: String? = null,
     var createdTime: String,
     var updatedTime: String
 )
@@ -18,5 +18,5 @@ data class EditTodoItemVO(
     val content: String,
     val completed: Int,
     val startTime: String,
-    val endTime: String
+    val endTime: String? = null
 )

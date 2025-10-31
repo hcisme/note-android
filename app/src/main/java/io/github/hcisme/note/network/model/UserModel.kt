@@ -10,11 +10,3 @@ data class UserInfoModel(
     var token: String,
     var expireAt: Long
 )
-
-data class LoginRequest(
-    val email: String,
-    val password: String,
-    val captchaKey: String,
-    val captcha: String
-)
-

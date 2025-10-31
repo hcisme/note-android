@@ -30,7 +30,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,11 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.R
-import io.github.hcisme.note.components.AnimatedLabelText
 import io.github.hcisme.note.components.RotationIcon
 import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.navigation.navigateToHomeAndClearStack
 import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.noRippleClickable
 
 @Composable
 fun LoginPage() {
@@ -57,6 +60,7 @@ fun LoginPage() {
     val navController = LocalNavController.current
     val focusManager = LocalFocusManager.current
     val loginVM = viewModel<LoginViewModel>()
+    var passwordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         loginVM.getCaptcha()
@@ -109,11 +113,9 @@ fun LoginPage() {
             verticalArrangement = Arrangement.spacedBy(space = 8.dp, Alignment.CenterVertically)
         ) {
             TextField(
-                value = loginVM.email,
-                onValueChange = { loginVM.email = it },
-                label = {
-                    AnimatedLabelText(defaultLabel = "邮箱", errorMessage = loginVM.emailError)
-                },
+                value = loginVM.loginFormData.email,
+                onValueChange = { loginVM.loginFormData = loginVM.loginFormData.copy(email = it) },
+                label = { Text("邮箱") },
                 singleLine = true,
                 leadingIcon = {
                     Icon(
@@ -128,15 +130,21 @@ fun LoginPage() {
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                )
+                ),
+                isError = loginVM.errorMap.containsKey("email"),
+                supportingText = {
+                    if (loginVM.errorMap.containsKey("email")) {
+                        Text(loginVM.errorMap.getValue("email"))
+                    }
+                }
             )
 
             TextField(
-                value = loginVM.password,
-                onValueChange = { loginVM.password = it },
-                label = {
-                    AnimatedLabelText(defaultLabel = "密码", errorMessage = loginVM.passwordError)
+                value = loginVM.loginFormData.password,
+                onValueChange = {
+                    loginVM.loginFormData = loginVM.loginFormData.copy(password = it)
                 },
+                label = { Text("密码") },
                 singleLine = true,
                 leadingIcon = {
                     Icon(
@@ -144,17 +152,12 @@ fun LoginPage() {
                         contentDescription = null
                     )
                 },
-                visualTransformation = if (loginVM.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     Icon(
-                        painterResource(if (loginVM.passwordVisible) R.drawable.visible else R.drawable.invisible),
+                        painterResource(if (passwordVisible) R.drawable.visible else R.drawable.invisible),
                         contentDescription = null,
-                        modifier = Modifier.clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            loginVM.passwordVisible = !loginVM.passwordVisible
-                        }
+                        modifier = Modifier.noRippleClickable { passwordVisible = !passwordVisible }
                     )
                 },
                 shape = MaterialTheme.shapes.small,
@@ -164,7 +167,13 @@ fun LoginPage() {
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                )
+                ),
+                isError = loginVM.errorMap.containsKey("password"),
+                supportingText = {
+                    if (loginVM.errorMap.containsKey("password")) {
+                        Text(loginVM.errorMap.getValue("password"))
+                    }
+                }
             )
 
             Row(
@@ -175,14 +184,11 @@ fun LoginPage() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextField(
-                    value = loginVM.captcha,
-                    onValueChange = { loginVM.captcha = it },
-                    label = {
-                        AnimatedLabelText(
-                            defaultLabel = "验证码",
-                            errorMessage = loginVM.captchaError
-                        )
+                    value = loginVM.loginFormData.captcha,
+                    onValueChange = {
+                        loginVM.loginFormData = loginVM.loginFormData.copy(captcha = it)
                     },
+                    label = { Text("验证码") },
                     singleLine = true,
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
