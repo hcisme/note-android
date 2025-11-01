@@ -19,12 +19,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.hcisme.note.components.calcStatusBarHeight
 import io.github.hcisme.note.components.time.DateTimePickerPopup
 import io.github.hcisme.note.components.time.rememberTimePickerState
 import io.github.hcisme.note.utils.formatWithPattern
@@ -132,10 +135,20 @@ fun CompletionStatusField() {
  */
 @Composable
 fun StartTimePickerField() {
+    val density = LocalDensity.current
     val timePickerState = rememberTimePickerState()
     val todoFormVM = viewModel<TodoFormViewModel>()
+    // TODO 临时解决位置错误问题
+    val statusBarHeight = calcStatusBarHeight()
+    val topBarWithStatusBarHeightPx = remember(statusBarHeight) {
+        with(density) { 80.dp.toPx() + statusBarHeight }
+    }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onGloballyPositioned { timePickerState.coordsRef.set(it) },
+    ) {
         Text(
             text = "开始时间",
             style = MaterialTheme.typography.bodyMedium,
@@ -146,7 +159,6 @@ fun StartTimePickerField() {
                 offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
             )
         )
-
         OutlinedTextField(
             value = todoFormVM.item.startTime,
             onValueChange = {},
@@ -162,8 +174,7 @@ fun StartTimePickerField() {
             },
             modifier = Modifier
                 .padding(top = 4.dp)
-                .fillMaxWidth()
-                .onGloballyPositioned { coords -> timePickerState.coordsRef.set(coords) },
+                .fillMaxWidth(),
             isError = todoFormVM.errorMap.containsKey("startTime"),
             supportingText = {
                 if (todoFormVM.errorMap.containsKey("startTime")) {
@@ -176,7 +187,7 @@ fun StartTimePickerField() {
     DateTimePickerPopup(
         visible = timePickerState.visible,
         selectedDateTime = if (todoFormVM.item.startTime.isNotEmpty()) todoFormVM.item.startTime.toLocalDateTime() else null,
-        anchorBoundsIntOffset = timePickerState.anchorOffset,
+        anchorBoundsIntOffset = timePickerState.anchorOffset?.let { it.copy(y = it.y - topBarWithStatusBarHeightPx.toInt()) },
         onDismiss = { timePickerState.close() },
         onDateTimeSelected = { dateTime ->
             todoFormVM.onValuesChange(todoFormVM.item.copy(startTime = dateTime.formatWithPattern()))
@@ -193,10 +204,20 @@ fun StartTimePickerField() {
  */
 @Composable
 fun EndTimePickerField() {
+    val density = LocalDensity.current
     val timePickerState = rememberTimePickerState()
     val todoFormVM = viewModel<TodoFormViewModel>()
+    // TODO 临时解决位置错误问题
+    val statusBarHeight = calcStatusBarHeight()
+    val topBarWithStatusBarHeightPx = remember(statusBarHeight) {
+        with(density) { 68.dp.toPx() + statusBarHeight }
+    }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onGloballyPositioned { timePickerState.coordsRef.set(it) }
+    ) {
         Text(
             text = "结束时间",
             style = MaterialTheme.typography.bodyMedium,
@@ -221,7 +242,11 @@ fun EndTimePickerField() {
                             )
                         }
                     }
-                    IconButton(onClick = { timePickerState.open() }) {
+                    IconButton(
+                        onClick = {
+                            timePickerState.open()
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "选择结束日期"
@@ -232,14 +257,13 @@ fun EndTimePickerField() {
             modifier = Modifier
                 .padding(top = 4.dp)
                 .fillMaxWidth()
-                .onGloballyPositioned { coords -> timePickerState.coordsRef.set(coords) }
         )
     }
 
     DateTimePickerPopup(
         visible = timePickerState.visible,
         selectedDateTime = todoFormVM.item.endTime?.toLocalDateTime(),
-        anchorBoundsIntOffset = timePickerState.anchorOffset,
+        anchorBoundsIntOffset = timePickerState.anchorOffset?.let { it.copy(y = it.y - topBarWithStatusBarHeightPx.toInt()) },
         onDismiss = { timePickerState.close() },
         onDateTimeSelected = { dateTime ->
             todoFormVM.onValuesChange(todoFormVM.item.copy(endTime = dateTime.formatWithPattern()))
