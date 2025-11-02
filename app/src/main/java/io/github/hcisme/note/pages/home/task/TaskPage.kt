@@ -1,14 +1,12 @@
 package io.github.hcisme.note.pages.home.task
 
-import androidx.compose.foundation.Image
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,14 +20,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.hcisme.note.R
 import io.github.hcisme.note.components.Dialog
+import io.github.hcisme.note.components.Empty
 import io.github.hcisme.note.components.TimelineTaskItem
 import io.github.hcisme.note.navigation.navigateToTodoForm
 import io.github.hcisme.note.utils.LocalNavController
@@ -37,11 +34,17 @@ import io.github.hcisme.note.utils.LocalNavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskPage(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     val navHostController = LocalNavController.current
-    val taskVM = viewModel<TaskViewModel>()
+    val taskVM = viewModel<TaskViewModel>(context as ComponentActivity)
+
+    //ui 删除框相关
+    var deleteDialogVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        taskVM.getTodoList()
+        if (taskVM.todoList.isEmpty()) {
+            taskVM.getTodoList()
+        }
     }
 
     Scaffold(
@@ -72,25 +75,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
                 onRefresh = { taskVM.getTodoList() }
             ) {
                 if (taskVM.todoList.isEmpty() && !taskVM.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(
-                                modifier = Modifier.size(64.dp),
-                                painter = painterResource(R.drawable.nothing),
-                                contentDescription = null
-                            )
-                            Text(
-                                text = "暂无数据",
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
-                    }
+                    Empty()
                     LazyColumn(modifier = Modifier.fillMaxSize()) {}
                 } else {
                     var currentSelectTodoId by remember { mutableStateOf<Long?>(null) }
@@ -110,19 +95,19 @@ fun TaskPage(modifier: Modifier = Modifier) {
                                 },
                                 onClickDelete = {
                                     currentSelectTodoId = it.id
-                                    taskVM.deleteDialogVisible = true
+                                    deleteDialogVisible = true
                                 }
                             )
                         }
                     }
 
                     Dialog(
-                        visible = taskVM.deleteDialogVisible,
+                        visible = deleteDialogVisible,
                         confirmButtonText = "确定",
                         cancelButtonText = "取消",
                         onConfirm = {
                             currentSelectTodoId?.let {
-                                taskVM.deleteDialogVisible = false
+                                deleteDialogVisible = false
                                 taskVM.deleteTodoItemById(
                                     id = it,
                                     onSuccess = {
@@ -131,7 +116,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
                                 )
                             }
                         },
-                        onDismissRequest = { taskVM.deleteDialogVisible = false }
+                        onDismissRequest = { deleteDialogVisible = false }
                     ) {
                         Text(text = "确定删除吗")
                     }

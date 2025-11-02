@@ -39,7 +39,6 @@ class TaskViewModel : ViewModel() {
     )
         private set
     var isLoading by mutableStateOf(false)
-    var deleteDialogVisible by mutableStateOf(false)
     val todoList = mutableStateListOf<TodoItemModel>()
 
     fun changeDate(index: Int = selectedTabIndex, date: LocalDate = currentDate) {

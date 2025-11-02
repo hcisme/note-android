@@ -13,6 +13,8 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.hcisme.note.enums.BottomBarEnum
+import io.github.hcisme.note.pages.home.statistics.StatisticsPage
 import io.github.hcisme.note.pages.home.task.TaskPage
 import io.github.hcisme.note.pages.home.user.UserPage
 
@@ -33,14 +35,17 @@ fun HomePage(modifier: Modifier = Modifier) {
                 .weight(1f)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            holder.SaveableStateProvider(homeVM.currentPage) {
-                when (homeVM.currentPage) {
-                    0 -> TaskPage()
-                    1 -> UserPage()
+            holder.SaveableStateProvider(homeVM.currentPageEnum.index) {
+                when (homeVM.currentPageEnum.index) {
+                    BottomBarEnum.Note.index -> TaskPage()
+                    BottomBarEnum.Statistic.index -> StatisticsPage()
+                    BottomBarEnum.User.index -> UserPage()
                 }
             }
         }
-        BottomBar(currentPage = homeVM.currentPage) { homeVM.changePage(page = it) }
+        BottomBar(currentBottomBarEnum = homeVM.currentPageEnum) { barEnum ->
+            homeVM.changePage(pageEnum = barEnum)
+        }
     }
 
     BackHandler {

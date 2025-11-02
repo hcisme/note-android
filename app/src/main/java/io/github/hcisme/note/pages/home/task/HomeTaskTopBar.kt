@@ -1,5 +1,6 @@
 package io.github.hcisme.note.pages.home.task
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,8 +33,9 @@ import kotlinx.datetime.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTaskTopBar() {
+    val context = LocalContext.current
     val navHostController = LocalNavController.current
-    val taskVM = viewModel<TaskViewModel>()
+    val taskVM = viewModel<TaskViewModel>(context as ComponentActivity)
     val currentDate = taskVM.currentDate
     val datePickerState = rememberTimePickerState()
 

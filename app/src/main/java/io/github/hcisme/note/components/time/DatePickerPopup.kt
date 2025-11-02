@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,8 +49,9 @@ fun DatePickerPopup(
     initialMonth: Int,
     spanEachSide: Int = 5,
     animateDt: Int = 160,
+    allowUnSelectedMonth: Boolean = false,
     onSelect: (year: Int, month: Int, day: Int) -> Unit,
-    onClickToday: (year: Int, month: Int, day: Int) -> Unit,
+    onClickToday: ((year: Int, month: Int, day: Int) -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -59,7 +59,9 @@ fun DatePickerPopup(
     val monthListState = rememberLazyListState()
     var selectedYear by remember(visible) { mutableIntStateOf(initialYear) }
     var selectedMonth by remember(visible) { mutableIntStateOf(initialMonth) }
-    val years by remember { derivedStateOf { DateUtil.yearsAround(selectedYear, spanEachSide) } }
+    val years = remember(selectedYear, spanEachSide) {
+        DateUtil.yearsAround(selectedYear, spanEachSide)
+    }
     val months = remember { (1..12).toList() }
 
     // 动画状态
@@ -81,10 +83,12 @@ fun DatePickerPopup(
     LaunchedEffect(visible) {
         if (visible && anchorBoundsOffset != null) {
             val yearIndex = years.indexOfFirst { it == selectedYear }.let { if (it >= 0) it else 0 }
-            val monthIndex =
-                months.indexOfFirst { it == selectedMonth }.let { if (it >= 0) it else 0 }
             yearListState.scrollToItem(yearIndex)
-            monthListState.scrollToItem(monthIndex)
+            if (selectedMonth in months) {
+                val monthIndex =
+                    months.indexOfFirst { it == selectedMonth }.let { if (it >= 0) it else 0 }
+                monthListState.scrollToItem(monthIndex)
+            }
             innerIsVisible = true
         }
     }
@@ -154,7 +158,14 @@ fun DatePickerPopup(
                             Surface(
                                 modifier = Modifier
                                     .padding(end = 8.dp)
-                                    .clickable { selectedMonth = m },
+                                    .clickable {
+                                        selectedMonth =
+                                            if (allowUnSelectedMonth && selectedMonth == m) {
+                                                -1
+                                            } else {
+                                                m
+                                            }
+                                    },
                                 shape = RoundedCornerShape(8.dp),
                                 color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
                                 tonalElevation = if (selected) 4.dp else 0.dp
@@ -178,22 +189,24 @@ fun DatePickerPopup(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                     ) {
-                        TextButton(
-                            onClick = {
-                                val today = Clock.System.now()
-                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                                selectedYear = today.year
-                                selectedMonth = today.monthNumber
-                                onClickToday(
-                                    today.year,
-                                    today.monthNumber,
-                                    today.dayOfMonth
-                                )
-                                hide()
-                            },
-                            shape = MaterialTheme.shapes.small
-                        ) {
-                            Text("今天")
+                        onClickToday?.let { click ->
+                            TextButton(
+                                onClick = {
+                                    val today = Clock.System.now()
+                                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                    selectedYear = today.year
+                                    selectedMonth = today.monthNumber
+                                    click(
+                                        today.year,
+                                        today.monthNumber,
+                                        today.dayOfMonth
+                                    )
+                                    hide()
+                                },
+                                shape = MaterialTheme.shapes.small
+                            ) {
+                                Text("今天")
+                            }
                         }
 
                         TextButton(

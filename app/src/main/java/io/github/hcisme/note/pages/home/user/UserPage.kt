@@ -1,5 +1,6 @@
 package io.github.hcisme.note.pages.home.user
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,9 +39,10 @@ import io.github.hcisme.note.utils.noRippleClickable
 
 @Composable
 fun UserPage(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     val navHostController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
-    val userVM = viewModel<UserViewModel>()
+    val userVM = viewModel<UserViewModel>(context as ComponentActivity)
 
     LaunchedEffect(Unit) {
         userVM.userInfo = sharedPreferences.getUserInfo()

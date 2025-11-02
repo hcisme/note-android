@@ -20,20 +20,21 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.hcisme.note.R
+import io.github.hcisme.note.enums.BottomBarEnum
 
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
     height: Dp = 56.dp,
-    currentPage: Int,
-    onClick: (key: Int) -> Unit = {}
+    currentBottomBarEnum: BottomBarEnum,
+    onClick: (bottomBarEnum: BottomBarEnum) -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -45,18 +46,20 @@ fun BottomBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BottomBarItem(
-            pageKey = 0,
-            currentPage = currentPage,
-            label = "便签",
-            iconRes = R.drawable.task,
+            currentPage = currentBottomBarEnum.index,
+            bottomBarEnum = BottomBarEnum.Note,
             onClick = onClick
         )
 
         BottomBarItem(
-            pageKey = 1,
-            currentPage = currentPage,
-            label = "我的",
-            iconRes = R.drawable.user,
+            currentPage = currentBottomBarEnum.index,
+            bottomBarEnum = BottomBarEnum.Statistic,
+            onClick = onClick
+        )
+
+        BottomBarItem(
+            currentPage = currentBottomBarEnum.index,
+            bottomBarEnum = BottomBarEnum.User,
             onClick = onClick
         )
     }
@@ -64,13 +67,11 @@ fun BottomBar(
 
 @Composable
 private fun RowScope.BottomBarItem(
-    pageKey: Int,
     currentPage: Int,
-    label: String,
-    iconRes: Int,
-    onClick: (key: Int) -> Unit
+    bottomBarEnum: BottomBarEnum,
+    onClick: (bottomBarEnum: BottomBarEnum) -> Unit
 ) {
-    val isSelected = currentPage == pageKey
+    val isSelected = remember(currentPage, bottomBarEnum) { currentPage == bottomBarEnum.index }
     val color by animateColorAsState(
         targetValue = if (isSelected) {
             MaterialTheme.colorScheme.primary
@@ -78,14 +79,14 @@ private fun RowScope.BottomBarItem(
             MaterialTheme.colorScheme.onSurfaceVariant
         },
         animationSpec = TweenSpec(10),
-        label = "bottom_bar_item_color"
+        label = "${bottomBarEnum.label}_bottom_bar_item_color"
     )
 
     Box(
         modifier = Modifier
             .weight(1f)
             .fillMaxHeight()
-            .clickable { onClick(pageKey) }
+            .clickable { onClick(bottomBarEnum) }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -93,12 +94,12 @@ private fun RowScope.BottomBarItem(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(iconRes),
-                contentDescription = label,
+                painter = painterResource(bottomBarEnum.resourceId),
+                contentDescription = bottomBarEnum.label,
                 tint = color
             )
             Text(
-                text = label,
+                text = bottomBarEnum.label,
                 fontSize = 12.sp,
                 color = color
             )

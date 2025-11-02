@@ -28,8 +28,8 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 44
-        versionName = "1.0.29"
+        versionCode = 45
+        versionName = "1.0.30"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.compose.charts.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

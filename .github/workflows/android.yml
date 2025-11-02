@@ -96,4 +96,5 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 修复时间悬浮框错位问题
+            - 增加统计界面
+            - 优化性能

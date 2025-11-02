@@ -54,7 +54,6 @@ import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.LocalSharedPreferences
 import io.github.hcisme.note.utils.clearToken
 import io.github.hcisme.note.utils.clearUserInfo
-import io.github.hcisme.note.utils.getUserInfo
 import io.github.hcisme.note.utils.withBadge
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,15 +63,13 @@ fun SettingPage(modifier: Modifier = Modifier) {
     val density = LocalDensity.current
     val navHostController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
-    val userVM = viewModel<UserViewModel>()
-    val settingVM = viewModel<SettingViewModel>(context as ComponentActivity)
+    val userVM = viewModel<UserViewModel>(context as ComponentActivity)
+    val settingVM = viewModel<SettingViewModel>()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         settingVM.getUpdateVersionInfo()
-        userVM.userInfo = sharedPreferences.getUserInfo()
-        userVM.getUserInfo()
     }
 
     LaunchedEffect(showUpdateDialog) {
