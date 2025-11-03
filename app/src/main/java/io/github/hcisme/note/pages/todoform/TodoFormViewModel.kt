@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.hcisme.note.components.NotificationManager
+import io.github.hcisme.note.enums.FormFieldEnum
 import io.github.hcisme.note.enums.Message
 import io.github.hcisme.note.network.TodoItemService
 import io.github.hcisme.note.network.model.EditTodoItemVO
@@ -17,8 +18,8 @@ class TodoFormViewModel : ViewModel() {
     var item by mutableStateOf(TodoItemFormData())
     var haveChangedForm by mutableStateOf(false)
     var loading by mutableStateOf(false)
+    var currentEditField by mutableStateOf<FormFieldEnum?>(null)
     var errorMap by mutableStateOf(mapOf<String, String>())
-    var backDialogVisible by mutableStateOf(false)
 
     fun onValuesChange(item: TodoItemFormData) {
         this.item = item

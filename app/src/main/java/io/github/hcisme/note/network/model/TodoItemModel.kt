@@ -34,12 +34,14 @@ data class TodoItemFormData(
 
         if (title.isEmpty()) {
             errors["title"] = "标题不能为空"
-        } else if (title.length > 20) {
+        } else if (title.length >= 20) {
             errors["title"] = "昵称长度不能超过20个字符"
         }
 
         if (content.isEmpty()) {
             errors["content"] = "描述不能为空"
+        } else if (content.length >= 500) {
+            errors["content"] = "描述不能超过500个字符"
         }
 
         if (startTime.isEmpty()) {

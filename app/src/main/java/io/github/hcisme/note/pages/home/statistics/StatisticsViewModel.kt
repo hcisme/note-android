@@ -4,10 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.hcisme.note.components.NotificationManager
+import io.github.hcisme.note.enums.CompletionStatusEnum
 import io.github.hcisme.note.enums.Message
 import io.github.hcisme.note.enums.SortOrderEnum
 import io.github.hcisme.note.network.StatisticService
@@ -71,7 +71,7 @@ class StatisticsViewModel : ViewModel() {
                         Pie(
                             label = item.completed.toString(),
                             data = item.count.toDouble(),
-                            color = if (item.completed == 0) Color.Red else Color.Green,
+                            color = CompletionStatusEnum.getByStatus(item.completed)!!.color,
                             selected = item.completed.toString() == selectedLabel
                         )
                     }

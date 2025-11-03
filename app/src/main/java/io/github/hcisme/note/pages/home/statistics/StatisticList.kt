@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,13 +15,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.components.Empty
+import io.github.hcisme.note.enums.CompletionStatusEnum
 import io.github.hcisme.note.navigation.navigateToTodoForm
 import io.github.hcisme.note.utils.LocalNavController
+import io.github.hcisme.note.utils.withBadge
 
 @Composable
 fun StatisticList() {
@@ -43,7 +46,7 @@ fun StatisticList() {
             }
         }
 
-        items(statisticsVM.statisticTodoList) { item ->
+        itemsIndexed(statisticsVM.statisticTodoList) { index, item ->
             ListItem(
                 modifier = Modifier
                     .combinedClickable(
@@ -56,7 +59,13 @@ fun StatisticList() {
                         }
                     ),
                 headlineContent = {
-                    Text(item.title)
+                    Text(
+                        text = item.title,
+                        modifier = Modifier.withBadge(
+                            badgeColor = CompletionStatusEnum.getByStatus(item.completed)!!.color,
+                            offset = { Offset(size.width + 16, 0f) }
+                        )
+                    )
                 },
                 supportingContent = {
                     val endTime = if (item.endTime != null) "——${item.endTime}" else ""
@@ -65,7 +74,7 @@ fun StatisticList() {
                         style = MaterialTheme.typography.labelSmall
                     )
                 },
-                shadowElevation = 8.dp
+                shadowElevation = if (statisticsVM.statisticTodoList.size == index + 1) 0.dp else 8.dp
             )
         }
     }

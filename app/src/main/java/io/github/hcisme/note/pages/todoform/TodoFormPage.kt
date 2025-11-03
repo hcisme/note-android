@@ -15,8 +15,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -24,21 +26,24 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.Dialog
+import io.github.hcisme.note.components.EditTextDialog
 import io.github.hcisme.note.components.keyboardHeightCalculator
+import io.github.hcisme.note.enums.FormFieldEnum
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.noRippleClickable
-import kotlinx.coroutines.launch
 
 @Composable
 fun TodoFormPage(id: Long? = null) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val navHostController = LocalNavController.current
-    val scope = rememberCoroutineScope()
     val verticalScrollState = rememberScrollState()
     val keyboardHeight = keyboardHeightCalculator()
     val todoFormVM = viewModel<TodoFormViewModel>()
     val isEdit = remember(id) { id != null }
+
+    // ui 控制
+    var backDialogVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(id) {
         if (id != null) {
@@ -58,8 +63,8 @@ fun TodoFormPage(id: Long? = null) {
             keyboardController?.hide()
             return
         }
-        if (todoFormVM.haveChangedForm && !todoFormVM.backDialogVisible) {
-            todoFormVM.backDialogVisible = true
+        if (todoFormVM.haveChangedForm && !backDialogVisible) {
+            backDialogVisible = true
             return
         }
         navHostController.popBackStack()
@@ -91,17 +96,17 @@ fun TodoFormPage(id: Long? = null) {
             // 标题输入
             TitleInputField()
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 完成状态单选按钮
             CompletionStatusField()
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 开始时间选择
             StartTimePickerField()
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 结束时间选择
             EndTimePickerField()
@@ -113,19 +118,36 @@ fun TodoFormPage(id: Long? = null) {
         }
     }
 
+    if (todoFormVM.currentEditField != null) {
+        EditTextDialog(
+            visible = true,
+            formFieldEnum = todoFormVM.currentEditField!!,
+            value = when (todoFormVM.currentEditField!!) {
+                FormFieldEnum.INPUT -> todoFormVM.item.title
+                FormFieldEnum.TEXTAREA -> todoFormVM.item.content
+            },
+            onValueChange = { text ->
+                val newItem = when (todoFormVM.currentEditField!!) {
+                    FormFieldEnum.INPUT -> todoFormVM.item.copy(title = text)
+                    FormFieldEnum.TEXTAREA -> todoFormVM.item.copy(content = text)
+                }
+                todoFormVM.onValuesChange(item = newItem)
+            },
+            onDismiss = { todoFormVM.currentEditField = null }
+        )
+    }
+
     Dialog(
-        visible = todoFormVM.backDialogVisible,
+        visible = backDialogVisible,
         confirmButtonText = "确定",
         cancelButtonText = "取消",
         onConfirm = {
-            scope.launch {
-                todoFormVM.backDialogVisible = false
-                focusManager.clearFocus()
-                keyboardController?.hide()
-                navHostController.popBackStack()
-            }
+            backDialogVisible = false
+            focusManager.clearFocus()
+            keyboardController?.hide()
+            navHostController.popBackStack()
         },
-        onDismissRequest = { todoFormVM.backDialogVisible = false }
+        onDismissRequest = { backDialogVisible = false }
     ) {
         Text("编辑的内容未保存\n确认离开吗")
     }

@@ -1,8 +1,10 @@
 package io.github.hcisme.note.enums
 
-enum class CompletionStatusEnum(val status: Int, val desc: String) {
-    INCOMPLETE(0, "未完成"),
-    COMPLETED(1, "已完成");
+import androidx.compose.ui.graphics.Color
+
+enum class CompletionStatusEnum(val status: Int, val desc: String, val color: Color) {
+    INCOMPLETE(0, "未完成", Color(0xFFD32F2F)),
+    COMPLETED(1, "已完成", Color(0xFF2E7D32));
 
     companion object {
         /**

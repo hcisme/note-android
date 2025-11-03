@@ -96,5 +96,5 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 增加统计界面
-            - 优化性能
+            - 优化统计界面显示
+            - 优化编辑代办界面UI

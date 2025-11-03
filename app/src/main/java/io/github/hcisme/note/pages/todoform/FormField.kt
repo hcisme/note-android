@@ -1,11 +1,13 @@
 package io.github.hcisme.note.pages.todoform
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,8 +16,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.calcStatusBarHeight
 import io.github.hcisme.note.components.time.DateTimePickerPopup
 import io.github.hcisme.note.components.time.rememberTimePickerState
+import io.github.hcisme.note.enums.FormFieldEnum
 import io.github.hcisme.note.utils.formatWithPattern
 import io.github.hcisme.note.utils.noRippleClickable
 import io.github.hcisme.note.utils.toLocalDateTime
@@ -45,7 +48,7 @@ fun TitleInputField() {
     Column {
         Text(
             "标题",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.withBadge(
                 badgeText = "*",
@@ -53,23 +56,36 @@ fun TitleInputField() {
                 offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
             )
         )
-        OutlinedTextField(
-            value = todoFormVM.item.title,
-            onValueChange = {
-                todoFormVM.onValuesChange(todoFormVM.item.copy(title = it))
-            },
-            placeholder = { Text("请输入标题") },
+        Row(
             modifier = Modifier
                 .padding(top = 4.dp)
-                .fillMaxWidth(),
-            singleLine = true,
-            isError = todoFormVM.errorMap.containsKey("title"),
-            supportingText = {
-                if (todoFormVM.errorMap.containsKey("title")) {
-                    Text(todoFormVM.errorMap.getValue("title"))
-                }
+                .fillMaxWidth()
+                .height(48.dp)
+                .noRippleClickable { todoFormVM.currentEditField = FormFieldEnum.INPUT },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (todoFormVM.item.title.isNotEmpty()) {
+                Text(todoFormVM.item.title)
+            } else {
+                Text(
+                    text = "点击输入标题",
+                    color = LocalContentColor.current.copy(alpha = 0.6f)
+                )
             }
+        }
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.8.dp)
+                .background(MaterialTheme.colorScheme.onBackground)
         )
+        if (todoFormVM.errorMap.containsKey("title")) {
+            Text(
+                text = todoFormVM.errorMap.getValue("title"),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 }
 
@@ -159,29 +175,44 @@ fun StartTimePickerField() {
                 offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
             )
         )
-        OutlinedTextField(
-            value = todoFormVM.item.startTime,
-            onValueChange = {},
-            readOnly = true,
-            placeholder = { Text("点击输入开始时间") },
-            trailingIcon = {
-                IconButton(onClick = { timePickerState.open() }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "选择开始日期"
-                    )
-                }
-            },
+        Row(
             modifier = Modifier
                 .padding(top = 4.dp)
-                .fillMaxWidth(),
-            isError = todoFormVM.errorMap.containsKey("startTime"),
-            supportingText = {
-                if (todoFormVM.errorMap.containsKey("startTime")) {
-                    Text(text = todoFormVM.errorMap.getValue("startTime"))
-                }
+                .fillMaxWidth()
+                .height(48.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (todoFormVM.item.startTime.isNotEmpty()) {
+                Text(todoFormVM.item.startTime)
+            } else {
+                Text(
+                    text = "点击输入开始时间",
+                    color = LocalContentColor.current.copy(alpha = 0.6f)
+                )
             }
+
+            IconButton(onClick = { timePickerState.open() }) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "选择开始日期",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.8.dp)
+                .background(MaterialTheme.colorScheme.onBackground)
         )
+        if (todoFormVM.errorMap.containsKey("startTime")) {
+            Text(
+                text = todoFormVM.errorMap.getValue("startTime"),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 
     DateTimePickerPopup(
@@ -223,41 +254,59 @@ fun EndTimePickerField() {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        OutlinedTextField(
-            value = todoFormVM.item.endTime ?: "",
-            onValueChange = { },
-            readOnly = true,
-            placeholder = { Text("点击输入结束时间") },
-            trailingIcon = {
-                Row {
-                    if (todoFormVM.item.endTime != null) {
-                        IconButton(
-                            onClick = {
-                                todoFormVM.item = todoFormVM.item.copy(endTime = null)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "清除结束日期"
-                            )
-                        }
-                    }
-                    IconButton(
-                        onClick = {
-                            timePickerState.open()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "选择结束日期"
-                        )
-                    }
-                }
-            },
+        Row(
             modifier = Modifier
                 .padding(top = 4.dp)
                 .fillMaxWidth()
+                .height(48.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (todoFormVM.item.endTime?.isNotEmpty() == true) {
+                Text(todoFormVM.item.endTime!!)
+            } else {
+                Text(
+                    text = "点击输入结束时间",
+                    color = LocalContentColor.current.copy(alpha = 0.6f)
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (todoFormVM.item.endTime?.isNotEmpty() == true) {
+                    IconButton(
+                        onClick = {
+                            todoFormVM.onValuesChange(todoFormVM.item.copy(endTime = null))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "清除结束日期",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                IconButton(onClick = { timePickerState.open() }) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "选择结束日期",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.8.dp)
+                .background(MaterialTheme.colorScheme.onBackground)
         )
+        if (todoFormVM.errorMap.containsKey("endTime")) {
+            Text(
+                text = todoFormVM.errorMap.getValue("endTime"),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 
     DateTimePickerPopup(
@@ -293,22 +342,29 @@ fun DescriptionField() {
                 offset = { Offset(size.width + 4.dp.toPx(), 8.dp.toPx()) }
             )
         )
-        OutlinedTextField(
-            value = todoFormVM.item.content,
-            onValueChange = {
-                todoFormVM.onValuesChange(todoFormVM.item.copy(content = it))
-            },
+        Row(
             modifier = Modifier
                 .padding(top = 4.dp)
                 .fillMaxWidth()
-                .heightIn(min = 160.dp),
-            placeholder = { Text("请输入描述内容") },
-            isError = todoFormVM.errorMap.containsKey("content"),
-            supportingText = {
-                if (todoFormVM.errorMap.containsKey("content")) {
-                    Text(todoFormVM.errorMap.getValue("content"))
-                }
+                .heightIn(min = 48.dp)
+                .noRippleClickable { todoFormVM.currentEditField = FormFieldEnum.TEXTAREA },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (todoFormVM.item.content.isNotEmpty()) {
+                Text(todoFormVM.item.content)
+            } else {
+                Text(
+                    text = "点击输入描述内容",
+                    color = LocalContentColor.current.copy(alpha = 0.6f)
+                )
             }
-        )
+        }
+        if (todoFormVM.errorMap.containsKey("content")) {
+            Text(
+                text = todoFormVM.errorMap.getValue("content"),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 }
