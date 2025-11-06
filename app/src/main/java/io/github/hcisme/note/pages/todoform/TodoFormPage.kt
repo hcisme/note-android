@@ -22,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -119,19 +121,25 @@ fun TodoFormPage(id: Long? = null) {
     }
 
     if (todoFormVM.currentEditField != null) {
+        val editText = when (todoFormVM.currentEditField!!) {
+            FormFieldEnum.INPUT -> todoFormVM.item.title
+            FormFieldEnum.TEXTAREA -> todoFormVM.item.content
+        }
+        var textFieldValue by remember {
+            mutableStateOf(TextFieldValue(text = editText, selection = TextRange(editText.length)))
+        }
+
         EditTextDialog(
             visible = true,
             formFieldEnum = todoFormVM.currentEditField!!,
-            value = when (todoFormVM.currentEditField!!) {
-                FormFieldEnum.INPUT -> todoFormVM.item.title
-                FormFieldEnum.TEXTAREA -> todoFormVM.item.content
-            },
-            onValueChange = { text ->
+            value = textFieldValue,
+            onValueChange = { newFieldValue ->
                 val newItem = when (todoFormVM.currentEditField!!) {
-                    FormFieldEnum.INPUT -> todoFormVM.item.copy(title = text)
-                    FormFieldEnum.TEXTAREA -> todoFormVM.item.copy(content = text)
+                    FormFieldEnum.INPUT -> todoFormVM.item.copy(title = newFieldValue.text)
+                    FormFieldEnum.TEXTAREA -> todoFormVM.item.copy(content = newFieldValue.text)
                 }
                 todoFormVM.onValuesChange(item = newItem)
+                textFieldValue = newFieldValue
             },
             onDismiss = { todoFormVM.currentEditField = null }
         )

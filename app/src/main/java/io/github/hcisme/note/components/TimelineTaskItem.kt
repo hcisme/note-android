@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.hcisme.note.enums.CompletionStatusEnum
@@ -44,6 +45,7 @@ fun TimelineTaskItem(
     isCurrent: Boolean,
     isLast: Boolean,
     height: Dp = 200.dp,
+    contentMaxLines: Int = 3,
     onClick: () -> Unit = {},
     onClickDelete: () -> Unit = {}
 ) {
@@ -145,7 +147,11 @@ fun TimelineTaskItem(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Text(text = item.content)
+                    Text(
+                        text = item.content,
+                        maxLines = contentMaxLines,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
                     Spacer(modifier = Modifier.weight(1f))
 

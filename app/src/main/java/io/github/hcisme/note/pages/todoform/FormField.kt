@@ -156,7 +156,7 @@ fun StartTimePickerField() {
     val todoFormVM = viewModel<TodoFormViewModel>()
     // TODO 临时解决位置错误问题
     val statusBarHeight = calcStatusBarHeight()
-    val topBarWithStatusBarHeightPx = remember(statusBarHeight) {
+    val topBarWithStatusBarHeightPx = remember(statusBarHeight, density) {
         with(density) { 80.dp.toPx() + statusBarHeight }
     }
 
@@ -240,7 +240,7 @@ fun EndTimePickerField() {
     val todoFormVM = viewModel<TodoFormViewModel>()
     // TODO 临时解决位置错误问题
     val statusBarHeight = calcStatusBarHeight()
-    val topBarWithStatusBarHeightPx = remember(statusBarHeight) {
+    val topBarWithStatusBarHeightPx = remember(statusBarHeight, density) {
         with(density) { 68.dp.toPx() + statusBarHeight }
     }
 

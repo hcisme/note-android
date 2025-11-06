@@ -34,8 +34,8 @@ data class TodoItemFormData(
 
         if (title.isEmpty()) {
             errors["title"] = "标题不能为空"
-        } else if (title.length >= 20) {
-            errors["title"] = "昵称长度不能超过20个字符"
+        } else if (title.length >= 200) {
+            errors["title"] = "标题长度不能超过200个字符"
         }
 
         if (content.isEmpty()) {
