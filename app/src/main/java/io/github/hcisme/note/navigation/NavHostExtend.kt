@@ -38,3 +38,14 @@ fun NavHostController.navigateToHome() {
 fun NavHostController.navigateToSetting() {
     navigate(NavigationName.SETTING_PAGE)
 }
+
+/**
+ * 退出登录
+ */
+fun NavHostController.navigateToLoginAndClearStack() {
+    navigate(NavigationName.LOGIN_PAGE) {
+        popUpTo(NavigationName.HOME_PAGE) {
+            inclusive = true
+        }
+    }
+}

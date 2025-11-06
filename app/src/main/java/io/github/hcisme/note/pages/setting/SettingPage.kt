@@ -47,7 +47,7 @@ import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.enums.DownloadDialogTextEnum.Download
 import io.github.hcisme.note.enums.DownloadDialogTextEnum.Downloading
 import io.github.hcisme.note.enums.DownloadDialogTextEnum.Install
-import io.github.hcisme.note.navigation.NavigationName
+import io.github.hcisme.note.navigation.navigateToLoginAndClearStack
 import io.github.hcisme.note.pages.home.user.UserViewModel
 import io.github.hcisme.note.utils.DownloadProgressManager
 import io.github.hcisme.note.utils.LocalNavController
@@ -205,11 +205,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
                 }
             )
             showLogoutDialog = false
-            navHostController.navigate(NavigationName.LOGIN_PAGE) {
-                popUpTo(NavigationName.HOME_PAGE) {
-                    inclusive = true
-                }
-            }
+            navHostController.navigateToLoginAndClearStack()
         },
         onDismissRequest = { showLogoutDialog = false }
     ) {
