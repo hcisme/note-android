@@ -42,9 +42,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
     var deleteDialogVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (taskVM.todoList.isEmpty()) {
-            taskVM.getTodoList()
-        }
+        taskVM.getTodoList()
     }
 
     Scaffold(

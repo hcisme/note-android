@@ -1,6 +1,7 @@
 package io.github.hcisme.note.pages.home
 
 import android.app.Activity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,7 +23,7 @@ import io.github.hcisme.note.pages.home.user.UserPage
 fun HomePage(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val holder = rememberSaveableStateHolder()
-    val homeVM = viewModel<HomeViewModel>()
+    val homeVM = viewModel<HomeViewModel>(context as ComponentActivity)
 
     Column(
         modifier = modifier

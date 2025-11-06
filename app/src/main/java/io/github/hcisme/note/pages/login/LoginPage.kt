@@ -1,7 +1,6 @@
 package io.github.hcisme.note.pages.login
 
 import android.app.Activity
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -52,9 +51,9 @@ import io.github.hcisme.note.BuildConfig
 import io.github.hcisme.note.R
 import io.github.hcisme.note.components.RotationIcon
 import io.github.hcisme.note.constants.VersionConstant
+import io.github.hcisme.note.navigation.navigateToHomeAndClearStack
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.noRippleClickable
-import io.github.hcisme.note.utils.restartApp
 
 @Composable
 fun LoginPage() {
@@ -234,7 +233,7 @@ fun LoginPage() {
                     .align(Alignment.End)
                     .padding(top = 24.dp, end = 8.dp)
                     .width(160.dp),
-                onClick = { loginVM.submit { (context as ComponentActivity).restartApp() } },
+                onClick = { loginVM.submit { navController.navigateToHomeAndClearStack() } },
                 enabled = loginVM.isLoginIng.not(),
                 shape = MaterialTheme.shapes.small
             ) {
