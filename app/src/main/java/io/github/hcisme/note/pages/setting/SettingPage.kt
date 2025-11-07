@@ -45,7 +45,6 @@ import io.github.hcisme.note.BuildConfig
 import io.github.hcisme.note.components.Dialog
 import io.github.hcisme.note.constants.VersionConstant
 import io.github.hcisme.note.enums.DownloadDialogTextEnum.Download
-import io.github.hcisme.note.enums.DownloadDialogTextEnum.Downloading
 import io.github.hcisme.note.enums.DownloadDialogTextEnum.Install
 import io.github.hcisme.note.navigation.navigateToLoginAndClearStack
 import io.github.hcisme.note.pages.home.user.UserViewModel
@@ -114,7 +113,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
                 },
                 headlineContent = {
                     Text(
-                        text = "检查版本(${BuildConfig.BUILD_TYPE})",
+                        text = "检查版本",
                         modifier = Modifier
                             .withBadge(
                                 showBadge = settingVM.updateVersionInfo != null,
@@ -124,6 +123,12 @@ fun SettingPage(modifier: Modifier = Modifier) {
                                         with(density) { 2.dp.toPx() })
                                 }
                             )
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = BuildConfig.BUILD_TYPE,
+                        style = MaterialTheme.typography.labelMedium
                     )
                 },
                 trailingContent = {
@@ -242,7 +247,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
                     )
                 }
 
-                Downloading -> {}
+                else -> {}
             }
         },
         onDismissRequest = { showUpdateDialog = false }

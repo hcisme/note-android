@@ -13,7 +13,6 @@ import androidx.navigation.compose.rememberNavController
 import io.github.hcisme.note.components.NotificationManager
 import io.github.hcisme.note.components.NotificationPopup
 import io.github.hcisme.note.navigation.NavigationGraph
-import io.github.hcisme.note.network.NetworkConstants
 import io.github.hcisme.note.network.Request
 import io.github.hcisme.note.pages.AuthDialog
 import io.github.hcisme.note.pages.rememberAuthManager
@@ -38,7 +37,7 @@ class MainActivity : ComponentActivity() {
             val authManager = rememberAuthManager()
 
             LaunchedEffect(Unit) {
-                Request.init(baseUrl = NetworkConstants.BASE_URL, authManager = authManager) {
+                Request.init(baseUrl = BuildConfig.BASE_URL, authManager = authManager) {
                     sharedPreferences.getToken()
                 }
             }

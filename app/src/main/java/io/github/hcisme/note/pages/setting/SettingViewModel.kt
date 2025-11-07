@@ -22,6 +22,7 @@ import io.github.hcisme.note.utils.DownloadProgressManager
 import io.github.hcisme.note.utils.FileUtil
 import io.github.hcisme.note.utils.InstallManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -67,9 +68,11 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
             return
         }
 
+        val clearCacheJob = clearCache(showMessage = false)
         Toast.makeText(application, "下载开始", Toast.LENGTH_SHORT).show()
         DownloadProgressManager.updateProgress(0f)
         viewModelScope.launch {
+            clearCacheJob.join()
             apkDownloadManager.downloadApk(
                 versionCode = versionCode,
                 versionName = versionName,
@@ -137,8 +140,8 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun clearCache() {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun clearCache(showMessage: Boolean = true): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
             val downloadDir = File(
                 application.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
                 Constant.INNER_DOWNLOAD_DIR_NAME
@@ -154,7 +157,9 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
                 }
             } catch (_: Exception) {
             }
-            NotificationManager.showNotification("清除完毕")
+            if (showMessage) {
+                NotificationManager.showNotification("清除完毕")
+            }
         }
     }
 

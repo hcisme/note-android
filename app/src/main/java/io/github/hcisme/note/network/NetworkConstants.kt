@@ -1,9 +1,6 @@
 package io.github.hcisme.note.network
 
-import io.github.hcisme.note.BuildConfig
-
 object NetworkConstants {
-    val BASE_URL = BuildConfig.BASE_URL
     const val CONNECT_TIMEOUT = 15L
     const val READ_TIMEOUT = 15L
     const val WRITE_TIMEOUT = 15L

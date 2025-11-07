@@ -6,11 +6,13 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Streaming
 
 interface VersionApi {
     @GET("/api/appVersion/checkUpdate/{versionCode}")
     suspend fun getUpdateVersionInfo(@Path("versionCode") versionCode: Int): BaseResult<VersionModel?>
 
+    @Streaming
     @GET("/api/file/download/{versionCode}/{versionName}")
     suspend fun downloadNewVersionApp(
         @Path("versionCode") versionCode: Int,
