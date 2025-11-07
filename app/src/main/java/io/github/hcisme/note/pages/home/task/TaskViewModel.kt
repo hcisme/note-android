@@ -45,10 +45,10 @@ class TaskViewModel : ViewModel() {
         selectedTabIndex = index
         currentDate = date
 
-        getTodoList()
+        getTodoListWithLoading()
     }
 
-    fun getTodoList() {
+    fun getTodoListWithLoading() {
         getTodoListJob?.cancel()
         getTodoListJob = viewModelScope.launch {
             isLoading = true
@@ -66,13 +66,28 @@ class TaskViewModel : ViewModel() {
         }
     }
 
+    fun getTodoListWithoutLoading() {
+        getTodoListJob?.cancel()
+        getTodoListJob = viewModelScope.launch {
+            safeRequestCall(
+                call = { withContext(Dispatchers.IO) { TodoItemService.getList(time = currentDate.toString()) } },
+                onSuccess = {
+                    todoList.apply {
+                        clear()
+                        addAll(it.data)
+                    }
+                }
+            )
+        }
+    }
+
     fun deleteTodoItemById(id: Long, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             safeRequestCall(
                 call = { withContext(Dispatchers.IO) { TodoItemService.deleteTodoItem(id) } },
                 onSuccess = {
                     NotificationManager.showNotification(Message.DELETE_SUCCESS.message)
-                    getTodoList()
+                    getTodoListWithLoading()
                     onSuccess()
                 }
             )

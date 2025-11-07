@@ -42,7 +42,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
     var deleteDialogVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        taskVM.getTodoList()
+        taskVM.getTodoListWithoutLoading()
     }
 
     Scaffold(
@@ -70,7 +70,7 @@ fun TaskPage(modifier: Modifier = Modifier) {
                     .weight(1f)
                     .background(MaterialTheme.colorScheme.background),
                 isRefreshing = taskVM.isLoading,
-                onRefresh = { taskVM.getTodoList() }
+                onRefresh = { taskVM.getTodoListWithLoading() }
             ) {
                 if (taskVM.todoList.isEmpty() && !taskVM.isLoading) {
                     Empty()

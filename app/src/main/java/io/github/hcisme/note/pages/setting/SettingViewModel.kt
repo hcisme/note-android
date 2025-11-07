@@ -36,10 +36,7 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
             safeRequestCall(
                 call = { VersionService.getUpdateVersionInfo(versionCode = VersionConstant.CODE) },
                 onSuccess = { result ->
-                    val data = result.data
-                    if (data == null) {
-                        return@safeRequestCall
-                    }
+                    val data = result.data ?: return@safeRequestCall
                     updateVersionInfo = data
                 }
             )

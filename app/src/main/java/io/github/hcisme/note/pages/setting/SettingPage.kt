@@ -64,7 +64,7 @@ fun SettingPage(modifier: Modifier = Modifier) {
     val navHostController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
     val userVM = viewModel<UserViewModel>(context as ComponentActivity)
-    val settingVM = viewModel<SettingViewModel>()
+    val settingVM = viewModel<SettingViewModel>(context)
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
 
