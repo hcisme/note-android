@@ -2,13 +2,10 @@ package io.github.hcisme.note.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -32,16 +29,28 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
     val navController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
     val enterTransition = remember {
-        slideInVertically(
-            animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-            initialOffsetY = { it / 3 }
-        ) + fadeIn(animationSpec = tween(durationMillis = 300))
+        slideInHorizontally(
+            animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
+            initialOffsetX = { it }
+        )
+    }
+    val popEnterTransition = remember {
+        slideInHorizontally(
+            animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
+            initialOffsetX = { -it }
+        )
     }
     val exitTransition = remember {
-        slideOutVertically(
-            animationSpec = tween(durationMillis = 280, easing = FastOutLinearInEasing),
-            targetOffsetY = { it / 3 }
-        ) + fadeOut(animationSpec = tween(durationMillis = 400))
+        slideOutHorizontally(
+            animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
+            targetOffsetX = { it }
+        )
+    }
+    val popExitTransition = remember {
+        slideOutHorizontally(
+            animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
+            targetOffsetX = { -it }
+        )
     }
 
     NavHost(
@@ -55,7 +64,12 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
         popExitTransition = { ExitTransition.None },
         startDestination = if (sharedPreferences.getToken() == null) NavigationName.LOGIN_PAGE else NavigationName.HOME_PAGE
     ) {
-        composable(route = NavigationName.HOME_PAGE) {
+        composable(
+            route = NavigationName.HOME_PAGE,
+            popEnterTransition = { popEnterTransition },
+            exitTransition = { popExitTransition },
+            popExitTransition = null
+        ) {
             HomePage()
         }
 
