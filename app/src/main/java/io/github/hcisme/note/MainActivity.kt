@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 LocalNavController provides navController,
                 LocalSharedPreferences provides sharedPreferences
             ) {
-                NoteTheme(darkTheme = false, dynamicColor = false) {
+                NoteTheme(dynamicColor = false) {
                     NavigationGraph()
 
                     AuthDialog(authManager)

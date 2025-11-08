@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.google.gson.Gson
 import io.github.hcisme.note.constants.StorageKeys
+import io.github.hcisme.note.enums.ThemeStateEnum
 import io.github.hcisme.note.network.model.UserInfoModel
 
 // =======================token
@@ -51,7 +52,7 @@ fun SharedPreferences.getUserInfo(): UserInfoModel? {
         try {
             val gson = Gson()
             gson.fromJson(userInfoJson, UserInfoModel::class.java)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     } else {
@@ -65,5 +66,32 @@ fun SharedPreferences.getUserInfo(): UserInfoModel? {
 fun SharedPreferences.clearUserInfo() {
     this.edit {
         remove(StorageKeys.KEY_USER_INFO).apply()
+    }
+}
+
+// ====================== 主题信息
+/**
+ * 获取主题模式
+ */
+fun SharedPreferences.getThemeMode(): ThemeStateEnum? {
+    val themeMode = this.getInt(StorageKeys.KEY_THEME_MODE, -1)
+    return ThemeStateEnum.fromMode(themeMode)
+}
+
+/**
+ * 保存主题模式
+ */
+fun SharedPreferences.saveThemeMode(themeMode: Int) {
+    this.edit {
+        putInt(StorageKeys.KEY_THEME_MODE, themeMode).apply()
+    }
+}
+
+/**
+ * 清除主题模式
+ */
+fun SharedPreferences.clearThemeMode() {
+    this.edit {
+        remove(StorageKeys.KEY_THEME_MODE).apply()
     }
 }

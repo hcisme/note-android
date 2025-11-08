@@ -1,6 +1,8 @@
 package io.github.hcisme.note.ui.theme
 
+import android.app.Activity
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -8,7 +10,13 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.hcisme.note.enums.ThemeStateEnum
 
 @Composable
 fun NoteTheme(
@@ -18,14 +26,38 @@ fun NoteTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
+    val themeVM = viewModel<ThemeViewModel>(context as ComponentActivity)
+    val insetsController = remember(view) {
+        if (!view.isInEditMode) {
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view)
+        } else {
+            null
+        }
+    }
+    val useDarkTheme = remember(themeVM.currentTheme, darkTheme) {
+        when (themeVM.currentTheme) {
+            ThemeStateEnum.Light -> false
+            ThemeStateEnum.Dark -> true
+            ThemeStateEnum.System -> darkTheme
+        }
+    }
 
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        useDarkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    SideEffect {
+        insetsController?.apply {
+            isAppearanceLightStatusBars = !useDarkTheme
+            isAppearanceLightNavigationBars = !useDarkTheme
+        }
     }
 
     MaterialTheme(

@@ -85,8 +85,8 @@ fun EditTextDialog(
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter)
                         .background(
-                            Color.White,
-                            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                            color = MaterialTheme.colorScheme.background,
+                            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                         )
                         .then(if (!isShowKeyboard) Modifier.navigationBarsPadding() else Modifier)
                         .padding(16.dp)

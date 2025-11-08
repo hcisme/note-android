@@ -34,6 +34,7 @@ fun StatisticOrder() {
         Text(
             text = statisticsVM.sortEnum.message,
             style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.noRippleClickable { statisticsVM.changeOrder() }
         )
         IconButton(
@@ -44,7 +45,8 @@ fun StatisticOrder() {
             Icon(
                 painter = painterResource(statisticsVM.sortEnum.resourceId),
                 contentDescription = statisticsVM.sortEnum.message,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
     }

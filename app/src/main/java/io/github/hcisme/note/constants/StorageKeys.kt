@@ -6,4 +6,5 @@ package io.github.hcisme.note.constants
 object StorageKeys {
     const val KEY_TOKEN = "token"
     const val KEY_USER_INFO = "user"
+    const val KEY_THEME_MODE = "theme_mode"
 }
