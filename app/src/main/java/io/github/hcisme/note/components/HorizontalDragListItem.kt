@@ -51,7 +51,6 @@ fun HorizontalDragListItem(
     val animatable = remember { Animatable(0f) }
     val onOpenChangeState by rememberUpdatedState(onOpenChange)
     val actionWidthPx = with(density) { actionWidth.toPx() }
-
     val draggableState = rememberDraggableState { delta ->
         val new = (offsetX + delta).coerceIn(-actionWidthPx, 0f)
         offsetX = new
@@ -94,7 +93,8 @@ fun HorizontalDragListItem(
                     orientation = Orientation.Horizontal,
                     state = draggableState,
                     onDragStopped = {
-                        val shouldExpand = offsetX <= -actionWidthPx / 2f
+                        val shouldExpand =
+                            offsetX <= if (isOpen) -actionWidthPx / 4f * 3 else -actionWidthPx / 4f
                         if (shouldExpand) {
                             animateTo(-actionWidthPx)
                             onOpenChangeState(true)

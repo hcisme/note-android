@@ -13,7 +13,11 @@ import retrofit2.http.Query
 
 interface TodoItemApi {
     @GET("/api/todoItem/list")
-    suspend fun getList(@Query("time") time: String): BaseResult<List<TodoItemModel>>
+    suspend fun getList(
+        @Query("time") time: String,
+        @Query("completed") completed: Int? = null,
+        @Query("sort") sort: Int? = null
+    ): BaseResult<List<TodoItemModel>>
 
     @DELETE("/api/todoItem/{id}")
     suspend fun deleteTodoItem(@Path("id") id: Long): BaseResult<Any?>

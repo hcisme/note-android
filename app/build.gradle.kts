@@ -28,8 +28,8 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 55
-        versionName = "1.0.40"
+        versionCode = 56
+        versionName = "1.0.41"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,7 +63,7 @@ android {
                 "proguard-rules.pro"
             )
             isDebuggable = false
-            isProfileable = true
+            isProfileable = false
         }
     }
     compileOptions {

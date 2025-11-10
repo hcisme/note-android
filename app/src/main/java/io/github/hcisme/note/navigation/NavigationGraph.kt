@@ -28,25 +28,29 @@ import io.github.hcisme.note.utils.getToken
 fun NavigationGraph(modifier: Modifier = Modifier) {
     val navController = LocalNavController.current
     val sharedPreferences = LocalSharedPreferences.current
-    val enterTransition = remember {
+    // 新页面从右侧滑入（前进动画）
+    val slideInFromRight = remember {
         slideInHorizontally(
             animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
-    val popEnterTransition = remember {
+    // 返回时页面从左侧滑入（后退进入动画）
+    val slideInFromLeft = remember {
         slideInHorizontally(
             animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
             initialOffsetX = { -it }
         )
     }
-    val exitTransition = remember {
+    // 页面向右侧滑出（前进退出动画）
+    val slideOutToRight = remember {
         slideOutHorizontally(
             animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
     }
-    val popExitTransition = remember {
+    // 返回时页面向左侧滑出（后退退出动画）
+    val slideOutToLeft = remember {
         slideOutHorizontally(
             animationSpec = tween(durationMillis = 320, easing = LinearOutSlowInEasing),
             targetOffsetX = { -it }
@@ -66,8 +70,8 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
     ) {
         composable(
             route = NavigationName.HOME_PAGE,
-            popEnterTransition = { popEnterTransition },
-            exitTransition = { popExitTransition },
+            popEnterTransition = { slideInFromLeft },
+            exitTransition = { slideOutToLeft },
             popExitTransition = null
         ) {
             HomePage()
@@ -86,9 +90,9 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
                     defaultValue = null
                 }
             ),
-            enterTransition = { enterTransition },
+            enterTransition = { slideInFromRight },
             popEnterTransition = null,
-            popExitTransition = { exitTransition }
+            popExitTransition = { slideOutToRight }
         ) { backStackEntry ->
             val idString = backStackEntry.arguments?.getString("id")
             val id = idString?.toLongOrNull()
@@ -97,9 +101,9 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
 
         composable(
             route = NavigationName.SETTING_PAGE,
-            enterTransition = { enterTransition },
+            enterTransition = { slideInFromRight },
             popEnterTransition = null,
-            popExitTransition = { exitTransition }
+            popExitTransition = { slideOutToRight }
         ) {
             SettingPage()
         }

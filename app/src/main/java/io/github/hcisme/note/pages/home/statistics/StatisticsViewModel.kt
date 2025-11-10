@@ -95,7 +95,7 @@ class StatisticsViewModel : ViewModel() {
         viewModelScope.launch {
             safeRequestCall(
                 call = {
-                    StatisticService.getTodoListByYearOrMonth(
+                    TodoItemService.getList(
                         time = timeStr,
                         completed = completed,
                         sort = sortEnum.status

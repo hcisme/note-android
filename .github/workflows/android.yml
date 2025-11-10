@@ -96,4 +96,5 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 优化动画
+            - 优化横向拖拽的触发阈值
+            - 优化查询代办列表
