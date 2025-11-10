@@ -49,3 +49,10 @@ fun NavHostController.navigateToLoginAndClearStack() {
         }
     }
 }
+
+/**
+ * 导航到 编辑 Search 界面
+ */
+fun NavHostController.navigateToSearch() {
+    navigate(NavigationName.SEARCH_PAGE)
+}

@@ -16,7 +16,8 @@ interface TodoItemApi {
     suspend fun getList(
         @Query("time") time: String,
         @Query("completed") completed: Int? = null,
-        @Query("sort") sort: Int? = null
+        @Query("sort") sort: Int? = null,
+        @Query("searchWord") searchWord: String? = null
     ): BaseResult<List<TodoItemModel>>
 
     @DELETE("/api/todoItem/{id}")

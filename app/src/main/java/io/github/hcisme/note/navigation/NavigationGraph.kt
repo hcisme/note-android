@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import io.github.hcisme.note.pages.home.HomePage
 import io.github.hcisme.note.pages.login.LoginPage
+import io.github.hcisme.note.pages.search.SearchPage
 import io.github.hcisme.note.pages.setting.SettingPage
 import io.github.hcisme.note.pages.todoform.TodoFormPage
 import io.github.hcisme.note.utils.LocalNavController
@@ -106,6 +107,15 @@ fun NavigationGraph(modifier: Modifier = Modifier) {
             popExitTransition = { slideOutToRight }
         ) {
             SettingPage()
+        }
+
+        composable(
+            route = NavigationName.SEARCH_PAGE,
+            enterTransition = { slideInFromRight },
+            popEnterTransition = null,
+            popExitTransition = { slideOutToRight }
+        ) {
+            SearchPage()
         }
     }
 }

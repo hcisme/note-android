@@ -1,13 +1,19 @@
 package io.github.hcisme.note.pages.home.statistics
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -15,13 +21,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.hcisme.note.components.calcStatusBarHeight
 import io.github.hcisme.note.components.time.DatePickerPopup
 import io.github.hcisme.note.components.time.rememberTimePickerState
+import io.github.hcisme.note.navigation.navigateToSearch
 import io.github.hcisme.note.utils.DateUtil
+import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.noRippleClickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticTopBar() {
     val context = LocalContext.current
+    val navHostController = LocalNavController.current
     val statusBarHeight = calcStatusBarHeight()
     val datePickerState = rememberTimePickerState()
     val statisticsVM = viewModel<StatisticsViewModel>(context as ComponentActivity)
@@ -32,7 +41,9 @@ fun StatisticTopBar() {
             Column(
                 modifier = Modifier
                     .noRippleClickable { datePickerState.open() }
-                    .onGloballyPositioned { datePickerState.coordsRef.set(it) }
+                    .onGloballyPositioned { datePickerState.coordsRef.set(it) },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 val month = remember(currentDate.monthNumber) {
                     if (currentDate.monthNumber in 1..12) "${DateUtil.months[currentDate.monthNumber - 1]} " else " "
@@ -41,6 +52,16 @@ fun StatisticTopBar() {
                     text = "${month}${currentDate.year}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        },
+        actions = {
+            IconButton(
+                onClick = { navHostController.navigateToSearch() }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "搜索"
                 )
             }
         }

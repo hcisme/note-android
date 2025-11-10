@@ -8,4 +8,6 @@ object NavigationName {
     const val TODO_FORM_PAGE = "/todo_form"
 
     const val SETTING_PAGE = "/setting"
+
+    const val SEARCH_PAGE = "/search"
 }

@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import io.github.hcisme.note.R
 
 @Composable
-fun Empty() {
+fun Empty(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(

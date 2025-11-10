@@ -25,10 +25,7 @@ import kotlinx.datetime.toLocalDateTime
 class StatisticsViewModel : ViewModel() {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var currentDate by mutableStateOf(
-        SimpleDate(
-            year = today.year,
-            monthNumber = today.monthNumber
-        )
+        SimpleDate(year = today.year, monthNumber = today.monthNumber)
     )
         private set
     var sortEnum by mutableStateOf(SortOrderEnum.ASC)
@@ -129,4 +126,8 @@ class StatisticsViewModel : ViewModel() {
 data class SimpleDate(
     val year: Int,
     val monthNumber: Int
-)
+) {
+    override fun toString(): String {
+        return "${"$year".padStart(4, '0')}-${"$monthNumber".padStart(2, '0')}-00"
+    }
+}
