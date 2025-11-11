@@ -22,7 +22,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class SearchViewModel : ViewModel() {
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var searchWord by mutableStateOf("")
 
     // 搜索的过滤条件
@@ -32,9 +32,6 @@ class SearchViewModel : ViewModel() {
     var completedEnum by mutableStateOf<CompletionStatusEnum?>(CompletionStatusEnum.COMPLETED)
     var sortEnum by mutableStateOf<SortOrderEnum?>(SortOrderEnum.ASC)
     val searchedTodoList = mutableStateListOf<TodoItemModel>()
-
-    // ui相关
-    var expanded by mutableStateOf(false)
 
     fun search(
         word: String = searchWord,
@@ -53,7 +50,6 @@ class SearchViewModel : ViewModel() {
     fun getSearchResultTodoList() {
         if (searchWord.isEmpty()) return
         val timeStr = currentDate.toString()
-        expanded = false
 
         viewModelScope.launch {
             safeRequestCall(
@@ -70,7 +66,6 @@ class SearchViewModel : ViewModel() {
                     searchedTodoList.apply {
                         this@apply.clear()
                         this@apply.addAll(list)
-                        expanded = true
                     }
                 }
             )

@@ -96,4 +96,4 @@ jobs:
           generate_release_notes: true
           body: |
             ### 本次更新内容
-            - 增加搜索界面 修复bug
+            - 优化搜索界面

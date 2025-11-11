@@ -1,44 +1,101 @@
 package io.github.hcisme.note.pages.search
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.hcisme.note.R
+import io.github.hcisme.note.components.Tag
 import io.github.hcisme.note.enums.CompletionStatusEnum
 import io.github.hcisme.note.enums.SortOrderEnum
+import io.github.hcisme.note.utils.noRippleClickable
 
 @Composable
 fun FilterSection() {
     val searchVM = viewModel<SearchViewModel>()
+    var filterDialogVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Tag("时间: ${searchVM.currentDate.year}-${searchVM.currentDate.monthNumber}")
+                searchVM.sortEnum?.let { Tag("排序: ${it.message}") }
+                Tag("状态: ${searchVM.completedEnum?.desc ?: "全部"}")
+            }
+
+            Icon(
+                painter = painterResource(R.drawable.filter),
+                contentDescription = "过滤",
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.noRippleClickable {
+                    filterDialogVisible = !filterDialogVisible
+                }
+            )
+        }
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .animateContentSize(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = FastOutSlowInEasing
+                    )
+                )
+        ) {
+            if (filterDialogVisible) {
+                EditableFilterContent()
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun EditableFilterContent() {
+    val searchVM = viewModel<SearchViewModel>()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(
-            text = "筛选条件",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // 时间筛选
@@ -49,6 +106,7 @@ fun FilterSection() {
             Text(
                 text = "时间:",
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.width(60.dp)
             )
             YearMonthInput(
@@ -75,6 +133,7 @@ fun FilterSection() {
             Text(
                 text = "排序:",
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.width(60.dp)
             )
             Row(
@@ -103,6 +162,7 @@ fun FilterSection() {
             Text(
                 text = "状态:",
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.width(60.dp)
             )
             Row(

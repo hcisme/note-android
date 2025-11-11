@@ -38,15 +38,19 @@ fun YearMonthInput(
         Box(
             modifier = Modifier
                 .width(100.dp)
-                .height(60.dp),
+                .height(40.dp),
             contentAlignment = Alignment.Center
         ) {
             BasicTextField(
                 value = yearValue,
                 onValueChange = { newValue ->
-                    // 只允许数字输入，且最多4位
                     if (newValue.all { it.isDigit() } && newValue.length <= 4) {
-                        onYearChange(newValue)
+                        val processedValue = when {
+                            newValue == "0" -> newValue
+                            newValue.startsWith("0") -> newValue.drop(1)
+                            else -> newValue
+                        }
+                        onYearChange(processedValue)
                     }
                 },
                 modifier = Modifier
@@ -65,7 +69,7 @@ fun YearMonthInput(
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(horizontal = 12.dp),
-                textStyle = MaterialTheme.typography.headlineMedium.copy(
+                textStyle = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface
                 ),
@@ -115,15 +119,19 @@ fun YearMonthInput(
         Box(
             modifier = Modifier
                 .width(70.dp)
-                .height(60.dp),
+                .height(40.dp),
             contentAlignment = Alignment.Center
         ) {
             BasicTextField(
                 value = monthValue,
                 onValueChange = { newValue ->
-                    // 只允许数字输入，且最多2位
                     if (newValue.all { it.isDigit() } && newValue.length <= 2) {
-                        onMonthChange(newValue)
+                        val processedValue = when {
+                            newValue == "0" -> newValue
+                            newValue.startsWith("0") -> newValue.drop(1)
+                            else -> newValue
+                        }
+                        onMonthChange(processedValue)
                     }
                 },
                 modifier = Modifier
@@ -142,7 +150,7 @@ fun YearMonthInput(
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(horizontal = 12.dp),
-                textStyle = MaterialTheme.typography.headlineMedium.copy(
+                textStyle = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface
                 ),
