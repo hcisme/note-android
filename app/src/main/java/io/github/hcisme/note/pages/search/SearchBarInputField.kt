@@ -51,14 +51,15 @@ fun SearchBarInputField() {
     val searchVM = viewModel<SearchViewModel>()
     val focusRequester = remember { FocusRequester() }
     val keyboardHeightDp = keyboardHeightCalculator()
+    val isShowKeyboard = remember(keyboardHeightDp) { keyboardHeightDp != 0.dp }
 
     LaunchedEffect(Unit) {
-        delay(80)
+        delay(200)
         focusRequester.requestFocus()
     }
 
-    LaunchedEffect(keyboardHeightDp) {
-        if (keyboardHeightDp == 0.dp) {
+    LaunchedEffect(isShowKeyboard) {
+        if (!isShowKeyboard) {
             focusManager.clearFocus()
         }
     }
@@ -69,7 +70,6 @@ fun SearchBarInputField() {
     }
 
     CenterAlignedTopAppBar(
-        modifier = Modifier.focusRequester(focusRequester),
         title = {
             Row(
                 modifier = Modifier
@@ -85,7 +85,9 @@ fun SearchBarInputField() {
                 )
 
                 BasicTextField(
-                    modifier = Modifier.fillMaxWidth(0.9f),
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .focusRequester(focusRequester),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.inverseSurface,
                         fontSize = 16.sp,
@@ -145,7 +147,8 @@ fun SearchBarInputField() {
     )
 
 
-    BackHandler(keyboardHeightDp != 0.dp) {
+    BackHandler(isShowKeyboard) {
         removeFocusAndKeyBoard()
+        navController.popBackStack()
     }
 }
