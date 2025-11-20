@@ -19,6 +19,7 @@ benchmarkMacroJunit4 = "1.2.4"
 baselineprofile = "1.4.1"
 profileinstaller = "1.3.1"
 composeChartsAndroid = "0.1.10"
+lazycolumnscrollbar = "2.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomato
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
 compose-charts-android = { module = "io.github.ehsannarmani:compose-charts-android", version.ref = "composeChartsAndroid" }
+lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazycolumnscrollbar" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

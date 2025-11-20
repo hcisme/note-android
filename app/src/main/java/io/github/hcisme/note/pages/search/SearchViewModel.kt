@@ -4,6 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.hcisme.note.components.NotificationManager
@@ -82,6 +87,39 @@ class SearchViewModel : ViewModel() {
                     onSuccess()
                 }
             )
+        }
+    }
+
+    fun buildHighLightWord(
+        title: String,
+        spanStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.Bold),
+    ): AnnotatedString {
+        return buildAnnotatedString {
+            if (searchWord.isBlank()) {
+                append(title)
+            } else {
+                var startIndex = 0
+                while (startIndex < title.length) {
+                    val matchIndex = title.indexOf(
+                        string = searchWord,
+                        startIndex = startIndex,
+                        ignoreCase = true
+                    )
+
+                    if (matchIndex == -1) {
+                        append(title.substring(startIndex))
+                        break
+                    }
+
+                    append(title.substring(startIndex, matchIndex))
+
+                    withStyle(style = spanStyle) {
+                        append(title.substring(matchIndex, matchIndex + searchWord.length))
+                    }
+
+                    startIndex = matchIndex + searchWord.length
+                }
+            }
         }
     }
 }

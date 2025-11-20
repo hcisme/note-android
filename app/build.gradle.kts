@@ -28,7 +28,7 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 60
+        versionCode = 61
         versionName = "1.0.45"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -98,6 +98,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.profileinstaller)
     implementation(libs.compose.charts.android)
+    implementation(libs.lazycolumnscrollbar)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,101 +33,116 @@ import io.github.hcisme.note.navigation.navigateToTodoForm
 import io.github.hcisme.note.utils.LocalNavController
 import io.github.hcisme.note.utils.noRippleClickable
 import io.github.hcisme.note.utils.withBadge
+import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
 fun StatisticList() {
     val navHostController = LocalNavController.current
     val context = LocalContext.current
+    val listState = rememberLazyListState()
     val statisticsVM = viewModel<StatisticsViewModel>(context as ComponentActivity)
     // ui 删除框相关
     var deleteDialogVisible by remember { mutableStateOf(false) }
     var currentSelectTodoId by remember { mutableStateOf<Long?>(null) }
     var openedItemId by remember { mutableStateOf<Long?>(null) }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    LazyColumnScrollbar(
+        state = listState,
+        settings = ScrollbarSettings(
+            scrollbarPadding = 0.dp,
+            hideDelayMillis = 1200,
+            thumbUnselectedColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f),
+            thumbSelectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
     ) {
-        if (statisticsVM.statisticTodoList.isEmpty()) {
-            item {
-                Empty()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            state = listState
+        ) {
+            if (statisticsVM.statisticTodoList.isEmpty()) {
+                item {
+                    Empty()
+                }
             }
-        }
 
-        itemsIndexed(
-            items = statisticsVM.statisticTodoList,
-            key = { _, item -> item.id }
-        ) { index, item ->
-            HorizontalDragListItem(
-                actionWidth = 160.dp,
-                isOpen = openedItemId == item.id,
-                onOpenChange = { openedItemId = if (it) item.id else null },
-                mainContent = {
-                    ListItem(
-                        modifier = Modifier.noRippleClickable {
-                            navHostController.navigateToTodoForm(id = item.id)
-                        },
-                        headlineContent = {
-                            Text(
-                                text = item.title,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.withBadge(
-                                    badgeColor = CompletionStatusEnum.getByStatus(item.completed)!!.color,
-                                    offset = { Offset(size.width + 16, 0f) }
-                                )
-                            )
-                        },
-                        supportingContent = {
-                            val endTime = if (item.endTime != null) "——${item.endTime}" else ""
-                            Text(
-                                text = "${item.startTime}${endTime}",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        },
-                        shadowElevation = if (statisticsVM.statisticTodoList.size == index + 1) 0.dp else 8.dp
-                    )
-                },
-                menuContent = {
-                    Box(
-                        modifier = Modifier
-                            .width(80.dp)
-                            .fillMaxHeight()
-                            .background(MaterialTheme.colorScheme.primary)
-                            .clickable {
+            itemsIndexed(
+                items = statisticsVM.statisticTodoList,
+                key = { _, item -> item.id }
+            ) { index, item ->
+                HorizontalDragListItem(
+                    actionWidth = 160.dp,
+                    isOpen = openedItemId == item.id,
+                    onOpenChange = { openedItemId = if (it) item.id else null },
+                    mainContent = {
+                        ListItem(
+                            modifier = Modifier.noRippleClickable {
                                 navHostController.navigateToTodoForm(id = item.id)
                             },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "编辑",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .width(80.dp)
-                            .fillMaxHeight()
-                            .background(MaterialTheme.colorScheme.error)
-                            .clickable {
-                                currentSelectTodoId = item.id
-                                deleteDialogVisible = true
+                            headlineContent = {
+                                Text(
+                                    text = item.title,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.withBadge(
+                                        badgeColor = CompletionStatusEnum.getByStatus(item.completed)!!.color,
+                                        offset = { Offset(size.width + 16, 0f) }
+                                    )
+                                )
                             },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "删除",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onError
+                            supportingContent = {
+                                val endTime = if (item.endTime != null) "——${item.endTime}" else ""
+                                Text(
+                                    text = "${item.startTime}${endTime}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            shadowElevation = if (statisticsVM.statisticTodoList.size == index + 1) 0.dp else 8.dp
                         )
+                    },
+                    menuContent = {
+                        Box(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colorScheme.primary)
+                                .clickable {
+                                    navHostController.navigateToTodoForm(id = item.id)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "编辑",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colorScheme.error)
+                                .clickable {
+                                    currentSelectTodoId = item.id
+                                    deleteDialogVisible = true
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "删除",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onError
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
+
 
     Dialog(
         visible = deleteDialogVisible,
