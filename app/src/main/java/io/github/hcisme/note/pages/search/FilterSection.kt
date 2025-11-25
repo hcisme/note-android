@@ -54,6 +54,9 @@ fun FilterSection() {
                 Tag("时间: ${searchVM.currentDate.year}-${searchVM.currentDate.monthNumber}")
                 searchVM.sortEnum?.let { Tag("排序: ${it.message}") }
                 Tag("状态: ${searchVM.completedEnum?.desc ?: "全部"}")
+                if (searchVM.searchedTodoList.isNotEmpty()) {
+                    Tag("${searchVM.searchedTodoList.size}条结果")
+                }
             }
 
             Icon(

@@ -28,20 +28,20 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 61
-        versionName = "1.0.46"
+        versionCode = 62
+        versionName = "1.0.47"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
-            val storePath = System.getenv("RELEASE_STORE_FILE") ?: ""
-            if (storePath.isNotEmpty()) {
-                storeFile = file(storePath)
-                storePassword = System.getenv("RELEASE_STORE_PASSWORD") ?: ""
-                keyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: ""
-                keyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+            val storePath = System.getenv("RELEASE_STORE_FILE")
+            storePath?.let { path ->
+                storeFile = file(path)
+                storePassword = System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
             }
         }
     }
