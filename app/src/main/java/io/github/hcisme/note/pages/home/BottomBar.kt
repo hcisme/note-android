@@ -3,7 +3,6 @@ package io.github.hcisme.note.pages.home
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.hcisme.note.enums.BottomBarEnum
+import io.github.hcisme.note.utils.noRippleClickable
 
 @Composable
 fun BottomBar(
@@ -39,9 +39,9 @@ fun BottomBar(
     Row(
         modifier = modifier
             .background(NavigationBarDefaults.containerColor)
+            .navigationBarsPadding()
             .fillMaxWidth()
-            .height(height)
-            .navigationBarsPadding(),
+            .height(height),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -86,7 +86,7 @@ private fun RowScope.BottomBarItem(
         modifier = Modifier
             .weight(1f)
             .fillMaxHeight()
-            .clickable { onClick(bottomBarEnum) }
+            .noRippleClickable { onClick(bottomBarEnum) }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
