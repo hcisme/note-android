@@ -38,10 +38,10 @@ fun BottomBar(
 ) {
     Row(
         modifier = modifier
-            .navigationBarsPadding()
+            .background(NavigationBarDefaults.containerColor)
             .fillMaxWidth()
             .height(height)
-            .background(NavigationBarDefaults.containerColor),
+            .navigationBarsPadding(),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
