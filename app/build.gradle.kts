@@ -17,6 +17,19 @@ val debugBaseUrl: String by lazy {
 val releaseBaseUrl: String by lazy {
     localProperties.getProperty("release.base.url", System.getenv("RELEASE_BASE_URL"))
 }
+// arca 配置
+val releaseArcaUrl: String by lazy {
+    localProperties.getProperty("release.acra.url", System.getenv("RELEASE_ARCA_URL"))
+}
+val releaseArcaLogin: String by lazy {
+    localProperties.getProperty("release.acra.basicAuthLogin", System.getenv("RELEASE_ARCA_LOGIN"))
+}
+val releaseArcaPassword: String by lazy {
+    localProperties.getProperty(
+        "release.acra.basicAuthPassword",
+        System.getenv("RELEASE_ARCA_PASSWORD")
+    )
+}
 
 android {
     namespace = "io.github.hcisme.note"
@@ -28,8 +41,8 @@ android {
         applicationId = "io.github.hcisme.note"
         minSdk = 24
         targetSdk = 36
-        versionCode = 64
-        versionName = "1.0.49"
+        versionCode = 65
+        versionName = "1.0.50"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,10 +62,17 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", debugBaseUrl)
+            buildConfigField("String", "ARCA_URL", "")
+            buildConfigField("String", "ARCA_LOGIN", "")
+            buildConfigField("String", "ARCA_PASSWORD", "")
         }
 
         release {
             buildConfigField("String", "BASE_URL", releaseBaseUrl)
+            buildConfigField("String", "ARCA_URL", releaseArcaUrl)
+            buildConfigField("String", "ARCA_LOGIN", releaseArcaLogin)
+            buildConfigField("String", "ARCA_PASSWORD", releaseArcaPassword)
+
             // 只有在签名配置有效时才应用
             if (signingConfigs.getByName("release").storeFile?.exists() == true) {
                 signingConfig = signingConfigs.getByName("release")
@@ -99,6 +119,10 @@ dependencies {
     implementation(libs.androidx.profileinstaller)
     implementation(libs.compose.charts.android)
     implementation(libs.lazycolumnscrollbar)
+
+    implementation(libs.acra.http)
+    implementation(libs.acra.toast)
+    implementation(libs.acra.limiter)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

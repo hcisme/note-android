@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">note</string>
+
+    <string name="crash_toast_text">程序遇到问题崩溃了，正在自动上报...</string>
 </resources>
